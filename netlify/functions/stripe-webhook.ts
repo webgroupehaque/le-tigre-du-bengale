@@ -75,6 +75,7 @@ export const handler = async (event: any) => {
         total_amount: (session.amount_total! / 100).toFixed(2),
         status: 'paid',
         stripe_payment_id: session.payment_intent as string,
+        order_type: metadata.orderType || 'delivery',
       };
 
       console.log('Attempting to insert order:', JSON.stringify(orderToInsert, null, 2));
@@ -114,6 +115,12 @@ export const handler = async (event: any) => {
                 <p><strong>Email :</strong> ${session.customer_email}</p>
                 <p><strong>Téléphone :</strong> ${metadata.customerPhone}</p>
                 <p><strong>Adresse :</strong> ${metadata.customerAddress}</p>
+              </div>
+
+              <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <p style="margin: 0; font-weight: bold; color: #92400e; font-size: 16px;">
+                  ${metadata.orderType === 'delivery' ? '🚲 LIVRAISON' : '🏠 À EMPORTER'}
+                </p>
               </div>
 
               <div style="background: #fff7ed; padding: 20px; border-radius: 8px; margin: 20px 0;">

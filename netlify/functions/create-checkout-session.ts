@@ -27,7 +27,7 @@ export const handler = async (event: any) => {
   }
 
   try {
-    const { cartItems, customerInfo, restaurantId } = JSON.parse(event.body);
+    const { cartItems, customerInfo, restaurantId, orderType } = JSON.parse(event.body);
 
     // Debug logs
     console.log('=== DEBUG CHECKOUT ===');
@@ -82,20 +82,23 @@ export const handler = async (event: any) => {
       return acc + (securePrice * item.quantity);
     }, 0);
 
-    // Ajouter les frais de livraison
-    const serverTotalAmount = serverCartTotal + DELIVERY_FEE;
+    // Ajouter les frais de livraison uniquement si delivery
+    const serverDeliveryFee = (orderType === 'delivery' ? DELIVERY_FEE : 0);
+    const serverTotalAmount = serverCartTotal + serverDeliveryFee;
 
-    // Ajouter les frais de livraison aux line items
-    lineItems.push({
-      price_data: {
-        currency: 'eur',
-        product_data: {
-          name: 'Frais de livraison',
+    // Ajouter les frais de livraison aux line items uniquement si delivery
+    if (serverDeliveryFee > 0) {
+      lineItems.push({
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: 'Frais de livraison',
+          },
+          unit_amount: Math.round(DELIVERY_FEE * 100), // 2.50€ en centimes
         },
-        unit_amount: Math.round(DELIVERY_FEE * 100), // 2.50€ en centimes
-      },
-      quantity: 1,
-    });
+        quantity: 1,
+      });
+    }
 
     // Create Checkout Session
     const session = await stripe.checkout.sessions.create({
@@ -109,8 +112,9 @@ export const handler = async (event: any) => {
         restaurantId,
         customerName: customerInfo.name,
         customerPhone: customerInfo.phone,
-        customerAddress: customerInfo.address,
+        customerAddress: customerInfo.address || 'À emporter',
         orderData: JSON.stringify(cartItems),
+        orderType: orderType || 'delivery',
       },
     });
 

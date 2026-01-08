@@ -6,13 +6,14 @@ import Home from './pages/Home';
 import Order from './pages/Order';
 import Contact from './pages/Contact';
 import Success from './pages/Success';
-import { PageView, CartItem } from './types';
+import { PageView, CartItem, OrderType } from './types';
 
 function App() {
   const [activePage, setActivePage] = useState<PageView>('home');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [orderType, setOrderType] = useState<OrderType>('delivery');
 
   // Détecter l'URL et changer la page automatiquement
   useEffect(() => {
@@ -50,11 +51,11 @@ function App() {
      setCart((prevCart) => prevCart.filter(item => item.id !== id));
   };
 
-  const handleCheckoutSubmit = async (customerInfo: CustomerInfo) => {
+  const handleCheckoutSubmit = async (customerInfo: CustomerInfo, submittedOrderType: OrderType) => {
     try {
       // Calculer le total
       const cartTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-      const deliveryFee = 2.50;
+      const deliveryFee = submittedOrderType === 'delivery' ? 2.50 : 0;
       const totalAmount = cartTotal + deliveryFee;
 
       // Appeler la fonction Netlify pour créer la session Stripe
@@ -66,6 +67,7 @@ function App() {
           customerInfo,
           totalAmount,
           restaurantId: 'tigre-bengale',
+          orderType: submittedOrderType,
         }),
       });
 
@@ -122,6 +124,8 @@ function App() {
           setIsCartOpen(false);
           setIsCheckoutOpen(true);
         }}
+        orderType={orderType}
+        setOrderType={setOrderType}
       />
 
       {/* Checkout Form */}
@@ -129,8 +133,9 @@ function App() {
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
         cartItems={cart}
-        totalAmount={cart.reduce((acc, item) => acc + (item.price * item.quantity), 0) + 2.50}
+        totalAmount={cart.reduce((acc, item) => acc + (item.price * item.quantity), 0) + (orderType === 'delivery' ? 2.50 : 0)}
         onSubmit={handleCheckoutSubmit}
+        orderType={orderType}
       />
 
       {/* Simple Footer */}

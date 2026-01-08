@@ -9,6 +9,8 @@ interface CartSidebarProps {
   updateQuantity: (id: string, delta: number) => void;
   removeFromCart: (id: string) => void;
   onCheckout: () => void;
+  orderType: OrderType;
+  setOrderType: (type: OrderType) => void;
 }
 
 const CartSidebar: React.FC<CartSidebarProps> = ({ 
@@ -17,9 +19,10 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
   cart, 
   updateQuantity, 
   removeFromCart,
-  onCheckout
+  onCheckout,
+  orderType,
+  setOrderType
 }) => {
-  const [orderType, setOrderType] = useState<OrderType>('delivery');
 
   // Helper to extract price from option string like "Rose (7.00€)"
   // If found, it overrides the base price. If not, returns item.price

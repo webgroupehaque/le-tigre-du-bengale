@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { OrderType } from '../types';
 
 interface CheckoutFormProps {
   isOpen: boolean;
@@ -11,7 +12,8 @@ interface CheckoutFormProps {
     quantity: number;
   }>;
   totalAmount: number;
-  onSubmit: (customerInfo: CustomerInfo) => void;
+  onSubmit: (customerInfo: CustomerInfo, orderType: OrderType) => void;
+  orderType: OrderType;
 }
 
 export interface CustomerInfo {
@@ -27,6 +29,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   cartItems,
   totalAmount,
   onSubmit,
+  orderType,
 }) => {
   const [formData, setFormData] = useState<CustomerInfo>({
     name: '',
@@ -59,8 +62,29 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      onSubmit(formData);
+    
+    // Si à emporter, l'adresse n'est pas obligatoire
+    if (orderType === 'pickup') {
+      const newErrors: Partial<CustomerInfo> = {};
+      if (!formData.name.trim()) newErrors.name = 'Le nom est requis';
+      if (!formData.email.trim()) {
+        newErrors.email = 'L\'email est requis';
+      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = 'Email invalide';
+      }
+      if (!formData.phone.trim()) {
+        newErrors.phone = 'Le téléphone est requis';
+      } else if (!/^[\d\s+()-]{10,}$/.test(formData.phone)) {
+        newErrors.phone = 'Numéro de téléphone invalide';
+      }
+      setErrors(newErrors);
+      if (Object.keys(newErrors).length === 0) {
+        onSubmit(formData, orderType);
+      }
+    } else {
+      if (validateForm()) {
+        onSubmit(formData, orderType);
+      }
     }
   };
 
@@ -174,7 +198,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
               <div>
                 <label htmlFor="address" className="block text-sm font-medium text-gray-400 mb-1">
-                  Adresse de livraison *
+                  Adresse de livraison {orderType === 'delivery' ? '*' : '(optionnel si à emporter)'}
                 </label>
                 <textarea
                   id="address"
