@@ -8,6 +8,7 @@ interface CartSidebarProps {
   cart: CartItem[];
   updateQuantity: (id: string, delta: number) => void;
   removeFromCart: (id: string) => void;
+  onCheckout: () => void;
 }
 
 const CartSidebar: React.FC<CartSidebarProps> = ({ 
@@ -15,7 +16,8 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
   onClose, 
   cart, 
   updateQuantity, 
-  removeFromCart 
+  removeFromCart,
+  onCheckout
 }) => {
   const [orderType, setOrderType] = useState<OrderType>('delivery');
 
@@ -190,7 +192,10 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
               </div>
             </div>
             
-            <button className="w-full py-4 bg-gradient-to-r from-bengal-gold to-orange-600 text-white font-bold uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_0_20px_rgba(234,88,12,0.3)] rounded-lg text-lg">
+            <button 
+              onClick={onCheckout}
+              className="w-full py-4 bg-gradient-to-r from-bengal-gold to-orange-600 text-white font-bold uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_0_20px_rgba(234,88,12,0.3)] rounded-lg text-lg"
+            >
               Commander
             </button>
           </div>

@@ -1,15 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import CartSidebar from './components/CartSidebar';
+import { CheckoutForm, CustomerInfo } from './components/CheckoutForm';
 import Home from './pages/Home';
 import Order from './pages/Order';
 import Contact from './pages/Contact';
+import Success from './pages/Success';
 import { PageView, CartItem } from './types';
 
 function App() {
   const [activePage, setActivePage] = useState<PageView>('home');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+
+  // Détecter l'URL et changer la page automatiquement
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path === '/success') {
+      setActivePage('success');
+    }
+  }, []);
 
   const addToCart = (item: CartItem) => {
     setCart((prevCart) => {
@@ -39,6 +50,39 @@ function App() {
      setCart((prevCart) => prevCart.filter(item => item.id !== id));
   };
 
+  const handleCheckoutSubmit = async (customerInfo: CustomerInfo) => {
+    try {
+      // Calculer le total
+      const cartTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+      const deliveryFee = 2.50;
+      const totalAmount = cartTotal + deliveryFee;
+
+      // Appeler la fonction Netlify pour créer la session Stripe
+      const response = await fetch('/.netlify/functions/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cartItems: cart,
+          customerInfo,
+          totalAmount,
+          restaurantId: 'tigre-bengale',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        // Rediriger vers Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        alert('Erreur lors de la création de la session de paiement');
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('Une erreur est survenue');
+    }
+  };
+
   const renderPage = () => {
     switch (activePage) {
       case 'home':
@@ -47,6 +91,8 @@ function App() {
         return <Order addToCart={addToCart} />;
       case 'contact':
         return <Contact />;
+      case 'success':
+        return <Success />;
       default:
         return <Home setPage={setActivePage} />;
     }
@@ -72,6 +118,19 @@ function App() {
         cart={cart}
         updateQuantity={updateQuantity}
         removeFromCart={removeFromCart}
+        onCheckout={() => {
+          setIsCartOpen(false);
+          setIsCheckoutOpen(true);
+        }}
+      />
+
+      {/* Checkout Form */}
+      <CheckoutForm
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        cartItems={cart}
+        totalAmount={cart.reduce((acc, item) => acc + (item.price * item.quantity), 0) + 2.50}
+        onSubmit={handleCheckoutSubmit}
       />
 
       {/* Simple Footer */}

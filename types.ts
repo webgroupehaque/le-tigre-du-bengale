@@ -21,7 +21,7 @@ export interface CartItem extends MenuItem {
 
 export type OrderType = 'delivery' | 'pickup';
 
-export type PageView = 'home' | 'order' | 'contact';
+export type PageView = 'home' | 'order' | 'contact' | 'success';
 
 export interface RestaurantInfo {
   name: string;
