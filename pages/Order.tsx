@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CartItem, MenuItem } from '../types';
 import { MENU_CATEGORIES, MENU_ITEMS } from '../constants';
-import { ShoppingBag, Star, Info, Tag, Edit3 } from 'lucide-react';
+import { ShoppingBag, Edit3 } from 'lucide-react';
 import MenuComposer from '../components/MenuComposer';
 
 interface OrderProps {
@@ -38,21 +38,6 @@ const Order: React.FC<OrderProps> = ({ addToCart }) => {
     <div className="min-h-screen pt-28 pb-20 bg-bengal-dark pattern-bg">
       <div className="container mx-auto px-4 md:px-8">
         
-        {/* Happy Hour / Promotion Banner */}
-        <div className="bg-gradient-to-r from-red-900 to-red-700 text-white p-4 rounded-lg shadow-lg mb-12 animate-fade-in text-center border border-red-500/30 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-          <div className="relative z-10">
-             <h3 className="text-2xl font-serif font-bold text-bengal-gold flex items-center justify-center gap-2">
-               <Star className="fill-current" size={24}/> HAPPY HOURS <Star className="fill-current" size={24}/>
-             </h3>
-             <p className="font-bold text-lg">11h30 - 12h30 & 18h30 - 19h30</p>
-             <p className="text-sm opacity-90 mt-1">1 Plat acheté à la carte = Le 2ème à -50% (sur place)</p>
-             <div className="mt-2 text-xs bg-black/20 inline-block px-3 py-1 rounded-full">
-               <Tag size={12} className="inline mr-1"/> Offre spéciale emporter: -10% sur l'addition (min 20€)
-             </div>
-          </div>
-        </div>
-
         <div className="flex flex-col lg:flex-row gap-8">
           
           {/* Sidebar Navigation (Sticky) */}
