@@ -1,0 +1,187 @@
+import React, { useState, useEffect } from 'react';
+import { CartItem, MenuItem } from '../types';
+import { MENU_CATEGORIES, MENU_ITEMS } from '../constants';
+import { ShoppingBag, Star, Info, Tag, Edit3 } from 'lucide-react';
+import MenuComposer from '../components/MenuComposer';
+
+interface OrderProps {
+  addToCart: (item: any) => void;
+}
+
+const Order: React.FC<OrderProps> = ({ addToCart }) => {
+  const [activeCategory, setActiveCategory] = useState(MENU_CATEGORIES[0]);
+  const [composingItem, setComposingItem] = useState<MenuItem | null>(null);
+
+  // Handle scroll spy to update active category
+  useEffect(() => {
+    const handleScroll = () => {
+      // Simple logic to highlight category if needed, or stick to click
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToCategory = (category: string) => {
+    setActiveCategory(category);
+    const element = document.getElementById(`cat-${category}`);
+    if (element) {
+      const y = element.getBoundingClientRect().top + window.pageYOffset - 150;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
+  const handleAddToCart = (item: MenuItem, selectedOptions?: { [key: string]: string }) => {
+      addToCart({ ...item, quantity: 1, selectedOptions });
+  };
+
+  return (
+    <div className="min-h-screen pt-28 pb-20 bg-bengal-dark pattern-bg">
+      <div className="container mx-auto px-4 md:px-8">
+        
+        {/* Happy Hour / Promotion Banner */}
+        <div className="bg-gradient-to-r from-red-900 to-red-700 text-white p-4 rounded-lg shadow-lg mb-12 animate-fade-in text-center border border-red-500/30 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+          <div className="relative z-10">
+             <h3 className="text-2xl font-serif font-bold text-bengal-gold flex items-center justify-center gap-2">
+               <Star className="fill-current" size={24}/> HAPPY HOURS <Star className="fill-current" size={24}/>
+             </h3>
+             <p className="font-bold text-lg">11h30 - 12h30 & 18h30 - 19h30</p>
+             <p className="text-sm opacity-90 mt-1">1 Plat acheté à la carte = Le 2ème à -50% (sur place)</p>
+             <div className="mt-2 text-xs bg-black/20 inline-block px-3 py-1 rounded-full">
+               <Tag size={12} className="inline mr-1"/> Offre spéciale emporter: -10% sur l'addition (min 20€)
+             </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          
+          {/* Sidebar Navigation (Sticky) */}
+          <aside className="lg:w-1/4">
+            <div className="sticky top-24 bg-bengal-card/90 backdrop-blur-md border border-orange-900/30 rounded-xl shadow-xl overflow-hidden">
+              <div className="p-4 bg-bengal-dark border-b border-orange-900/30">
+                <h3 className="font-serif text-xl text-bengal-gold">La Carte</h3>
+              </div>
+              <nav className="p-2 max-h-[70vh] overflow-y-auto scrollbar-hide">
+                <ul className="space-y-1">
+                  {MENU_CATEGORIES.map((cat) => (
+                    <li key={cat}>
+                      <button
+                        onClick={() => scrollToCategory(cat)}
+                        className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
+                          activeCategory === cat 
+                            ? 'bg-bengal-spice text-white shadow-lg translate-x-1' 
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </div>
+          </aside>
+
+          {/* Main Menu Content */}
+          <div className="lg:w-3/4 space-y-16">
+            {MENU_CATEGORIES.map((category) => {
+              const items = MENU_ITEMS.filter(item => item.category === category);
+              if (items.length === 0) return null;
+
+              return (
+                <section key={category} id={`cat-${category}`} className="scroll-mt-32">
+                  <div className="flex items-center mb-8">
+                    <div className="h-px bg-gradient-to-r from-transparent via-bengal-gold to-transparent flex-1 opacity-50"></div>
+                    <h2 className="text-3xl md:text-4xl font-serif text-white px-6 drop-shadow-sm text-center">
+                      {category}
+                    </h2>
+                    <div className="h-px bg-gradient-to-r from-transparent via-bengal-gold to-transparent flex-1 opacity-50"></div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {items.map((item) => (
+                      <div key={item.id} className="bg-bengal-card rounded-xl overflow-hidden border border-orange-900/10 hover:border-bengal-gold/40 transition-all duration-300 group shadow-lg flex flex-col">
+                        
+                        {/* Image Area */}
+                        <div className="h-48 bg-bengal-dark relative overflow-hidden group-hover:opacity-90 transition-opacity">
+                            <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-600 bg-black/40 placeholder-container">
+                               {/* Generic Placeholder Icon if image fails or is missing */}
+                               <div className="w-16 h-16 rounded-full border-2 border-gray-600 flex items-center justify-center mb-2">
+                                  <span className="font-serif text-2xl italic text-gray-500">Img</span>
+                               </div>
+                            </div>
+                            
+                            {item.image && (
+                                <img 
+                                    src={item.image} 
+                                    alt={item.name} 
+                                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 relative z-10" 
+                                    onError={(e) => {
+                                        // If image fails, hide it so placeholder (which is behind it) becomes visible
+                                        e.currentTarget.style.display = 'none';
+                                    }}
+                                />
+                            )}
+                        </div>
+
+                        <div className="p-6 flex flex-col flex-1">
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="text-xl font-bold text-white group-hover:text-bengal-gold transition-colors font-serif leading-tight">
+                              {item.name}
+                            </h3>
+                            <span className="text-bengal-gold font-bold text-lg whitespace-nowrap ml-3">
+                              {item.price.toFixed(2)} €
+                            </span>
+                          </div>
+                          
+                          <p className="text-gray-400 text-sm mb-6 flex-grow leading-relaxed">
+                            {item.description}
+                          </p>
+
+                          {item.options ? (
+                             <button 
+                                onClick={() => setComposingItem(item)}
+                                className="w-full py-3 bg-gradient-to-r from-bengal-gold/20 to-bengal-spice/20 border border-bengal-gold text-bengal-gold text-sm uppercase font-bold rounded hover:bg-bengal-gold hover:text-bengal-dark transition-all flex items-center justify-center space-x-2"
+                              >
+                                <Edit3 size={16} />
+                                <span>Composer</span>
+                              </button>
+                          ) : (
+                              <button 
+                                onClick={() => handleAddToCart(item)}
+                                className="w-full py-3 bg-white/5 border border-bengal-gold/30 text-bengal-gold text-sm uppercase font-bold rounded hover:bg-bengal-gold hover:text-bengal-dark transition-all flex items-center justify-center space-x-2 group-hover:bg-bengal-gold/10"
+                              >
+                                <ShoppingBag size={16} />
+                                <span>Ajouter</span>
+                              </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
+
+            {/* Disclaimer */}
+            <div className="text-center text-gray-500 text-sm italic mt-12 pb-8 border-t border-gray-800 pt-8">
+              <p>Viandes Halal. Les chèques ne sont pas acceptés.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Menu Composer Modal */}
+      {composingItem && (
+        <MenuComposer 
+          item={composingItem}
+          isOpen={true}
+          onClose={() => setComposingItem(null)}
+          onConfirm={handleAddToCart}
+        />
+      )}
+    </div>
+  );
+};
+
+export default Order;
