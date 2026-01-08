@@ -43,7 +43,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Salade, tomates, concombre, morceaux de dinde grillés au charbon de bois OU aux crevettes, épices avec une sauce salade.",
     price: 10.90,
     category: "ENTRÉES - Les Salades",
-    image: "./images/salade-bengale.png",
+    image: "/images/salade-bengale.png",
     options: [
       {
         title: "Choix de la garniture",
@@ -58,7 +58,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Poisson, légumes saisonniers, tomate, concombre, épices avec une sauce salade.",
     price: 10.90,
     category: "ENTRÉES - Les Salades",
-    image: "./images/salade-poisson.png"
+    image: "/images/salade-poisson.png"
   },
   {
     id: "salade-vegetarienne",
@@ -66,7 +66,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Salade, tomates, concombre, carottes râpées, pomme de terre et sauce salade.",
     price: 8.90,
     category: "ENTRÉES - Les Salades",
-    image: "./images/salade-vegetarienne.png"
+    image: "/images/salade-vegetarienne.png"
   },
   {
     id: "raita",
@@ -74,7 +74,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Tomate, concombre, carotte, yaourt et épices.",
     price: 6.90,
     category: "ENTRÉES - Les Salades",
-    image: "./images/raita.png"
+    image: "/images/raita.png"
   },
   {
     id: "salade-crevettes",
@@ -82,7 +82,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Laitue, tomates, concombre, crevettes, sauce maison.",
     price: 11.90,
     category: "ENTRÉES - Les Salades",
-    image: "./images/salade-crevettes.png"
+    image: "/images/salade-crevettes.png"
   },
 
   // --- ENTRÉES - Nos Fritures (Beignets) ---
@@ -92,7 +92,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Beignets de poulet.",
     price: 8.90,
     category: "ENTRÉES - Nos Fritures",
-    image: "./images/mangso-pakora.png"
+    image: "/images/mangso-pakora.png"
   },
   {
     id: "mase-pakora",
@@ -100,7 +100,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Beignets de poisson.",
     price: 9.90,
     category: "ENTRÉES - Nos Fritures",
-    image: "./images/mase-pakora.png"
+    image: "/images/mase-pakora.png"
   },
   {
     id: "pakora-mixte",
@@ -108,7 +108,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Assortiment de beignets (farine pois chiche, oignons, pommes de terre, aubergines).",
     price: 10.90,
     category: "ENTRÉES - Nos Fritures",
-    image: "./images/pakora-mixte.png"
+    image: "/images/pakora-mixte.png"
   },
   {
     id: "frites",
@@ -116,7 +116,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Portion de frites.",
     price: 5.90,
     category: "ENTRÉES - Nos Fritures",
-    image: "./images/frites.png"
+    image: "/images/frites.png"
   },
   {
     id: "samossa",
@@ -124,7 +124,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Pâte feuilletée fourrée (Viande ou Légumes).",
     price: 6.90,
     category: "ENTRÉES - Nos Fritures",
-    image: "./images/samossa.png",
+    image: "/images/samossa.png",
     options: [
       {
         title: "Garniture",
@@ -139,7 +139,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Beignets de légumes.",
     price: 6.90,
     category: "ENTRÉES - Nos Fritures",
-    image: "./images/sobji-pakora.png",
+    image: "/images/sobji-pakora.png",
     options: [
       {
         title: "Choix du légume",
@@ -154,7 +154,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Beignets de crevettes décortiquées aux épices.",
     price: 11.90,
     category: "ENTRÉES - Nos Fritures",
-    image: "./images/chingri-pakora.png"
+    image: "/images/chingri-pakora.png"
   },
 
   // --- ENTRÉES - Spécialités Tandoori (Grillades) ---
@@ -164,7 +164,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Morceaux de poulet marinés sauce épices et grillés.",
     price: 10.90,
     category: "ENTRÉES - Spécialités Tandoori",
-    image: "./images/murgi-tikka.png"
+    image: "/images/murgi-tikka.png"
   },
   {
     id: "agneau-tikka",
@@ -172,7 +172,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Morceaux d'agneau marinés sauce épices et grillés.",
     price: 13.90,
     category: "ENTRÉES - Spécialités Tandoori",
-    image: "./images/agneau-tikka.png"
+    image: "/images/agneau-tikka.png"
   },
   {
     id: "grill-mixte",
@@ -180,7 +180,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Agneau, poulet, brochettes de bœuf, gambas, samosa, viande.",
     price: 24.90,
     category: "ENTRÉES - Spécialités Tandoori",
-    image: "./images/grill-mixte.png"
+    image: "/images/grill-mixte.png"
   },
   {
     id: "poulet-tandoori",
@@ -188,7 +188,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Pièces de poulet marinées et grillées.",
     price: 9.90,
     category: "ENTRÉES - Spécialités Tandoori",
-    image: "./images/poulet-tandoori.png",
+    image: "/images/poulet-tandoori.png",
     options: [
       {
         title: "Choix du morceau",
@@ -203,7 +203,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "4 pièces (env. 300gr), ail, gingembre, Tandoori, massala.",
     price: 19.90,
     category: "ENTRÉES - Spécialités Tandoori",
-    image: "./images/gambas-tandoori.png"
+    image: "/images/gambas-tandoori.png"
   },
   {
     id: "seekh-kebab",
@@ -211,7 +211,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Viande hachée en forme de long cigare grillé.",
     price: 10.90,
     category: "ENTRÉES - Spécialités Tandoori",
-    image: "./images/seekh-kebab.png"
+    image: "/images/seekh-kebab.png"
   },
 
   // --- LES PLATS (Sauces) ---
@@ -221,7 +221,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Sauce aux épices mijotés.",
     price: 15.90,
     category: "LES PLATS (Sauces)",
-    image: "./images/curry.png",
+    image: "/images/curry.png",
     options: [{ title: "Choix de la viande", required: true, choices: MEAT_OPTIONS }]
   },
   {
@@ -230,7 +230,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Sauce aux 24 épices.",
     price: 15.90,
     category: "LES PLATS (Sauces)",
-    image: "./images/madras.png",
+    image: "/images/madras.png",
     options: [{ title: "Choix de la viande", required: true, choices: MEAT_OPTIONS }]
   },
   {
@@ -239,7 +239,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Sauce tomate, poudre d'amande, beurre indien, safran.",
     price: 17.90,
     category: "LES PLATS (Sauces)",
-    image: "./images/makhani.png",
+    image: "/images/makhani.png",
     options: [{ title: "Choix de la viande", required: true, choices: MEAT_OPTIONS }]
   },
   {
@@ -248,7 +248,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Sauce 'maison' avec poudre d'amande, pistache et gingembre.",
     price: 17.90,
     category: "LES PLATS (Sauces)",
-    image: "./images/bengale.png",
+    image: "/images/bengale.png",
     options: [{ title: "Choix de la viande", required: true, choices: MEAT_OPTIONS }]
   },
   {
@@ -257,7 +257,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Sauce 'maison' légèrement pimentée, poudre d'amande et pistaches.",
     price: 17.90,
     category: "LES PLATS (Sauces)",
-    image: "./images/massala.png",
+    image: "/images/massala.png",
     options: [{ title: "Choix de la viande", required: true, choices: MEAT_OPTIONS }]
   },
   {
@@ -266,7 +266,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Sauce pimentée à la poudre de cajou, amande et pommes de terre.",
     price: 17.90,
     category: "LES PLATS (Sauces)",
-    image: "./images/vindaloo.png",
+    image: "/images/vindaloo.png",
     options: [{ title: "Choix de la viande", required: true, choices: MEAT_OPTIONS }]
   },
   {
@@ -275,7 +275,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Sauce mijotée avec oignons, poivrons, curcuma, tomate et coriandre.",
     price: 17.90,
     category: "LES PLATS (Sauces)",
-    image: "./images/jalferazi.png",
+    image: "/images/jalferazi.png",
     options: [{ title: "Choix de la viande", required: true, choices: MEAT_OPTIONS }]
   },
   {
@@ -284,7 +284,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Sauce à la crème, poudre d'amande, coco, pistache, légèrement sucrée.",
     price: 17.90,
     category: "LES PLATS (Sauces)",
-    image: "./images/shahi-korma.png",
+    image: "/images/shahi-korma.png",
     options: [{ title: "Choix de la viande", required: true, choices: MEAT_OPTIONS }]
   },
   {
@@ -293,7 +293,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Oignons, poivrons et tomates sautés à la coriandre, sauce maison.",
     price: 18.90,
     category: "LES PLATS (Sauces)",
-    image: "./images/kowrai.png",
+    image: "/images/kowrai.png",
     options: [{ title: "Choix de la viande", required: true, choices: MEAT_OPTIONS }]
   },
   {
@@ -302,7 +302,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Filet de saumon Label Rouge, crème fraîche, safran, citron.",
     price: 20.90,
     category: "LES PLATS (Sauces)",
-    image: "./images/oceanien.png"
+    image: "/images/oceanien.png"
   },
   {
     id: "galda-chingri",
@@ -310,7 +310,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Gambas 16/20 du Bangladesh.",
     price: 19.90,
     category: "LES PLATS (Sauces)",
-    image: "./images/galda-chingri.png",
+    image: "/images/galda-chingri.png",
     options: [
         { title: "Sauce", required: true, choices: ["Sauce Massala", "Sauce Vindaloo"] }
     ]
@@ -321,7 +321,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Morceaux de dinde ou poulet grillés, sauce oignons et poivrons.",
     price: 17.90,
     category: "LES PLATS (Sauces)",
-    image: "./images/tikka-massala.png",
+    image: "/images/tikka-massala.png",
     options: [
         { title: "Viande", required: true, choices: ["Poulet Tikka", "Dinde Tikka"] }
     ]
@@ -334,7 +334,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Curry de légumes mixtes, pommes de terre, petits pois, choux fleurs, poivrons verts.",
     price: 12.90,
     category: "PLATS LÉGUMES (Végétariens)",
-    image: "./images/sobji-curry.png"
+    image: "/images/sobji-curry.png"
   },
   {
     id: "alou-saag",
@@ -342,7 +342,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Pomme de terre, curry d'épinards avec de la crème.",
     price: 12.90,
     category: "PLATS LÉGUMES (Végétariens)",
-    image: "./images/alou-saag.png"
+    image: "/images/alou-saag.png"
   },
   {
     id: "dal-makani",
@@ -350,7 +350,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Lentilles indiennes mijotée au beurre indien.",
     price: 12.90,
     category: "PLATS LÉGUMES (Végétariens)",
-    image: "./images/dal-makani.png"
+    image: "/images/dal-makani.png"
   },
   {
     id: "baigan-borta",
@@ -358,7 +358,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Aubergines cuites au feu de charbon de bois, crème, aromatisés aux épices.",
     price: 12.90,
     category: "PLATS LÉGUMES (Végétariens)",
-    image: "./images/baigan-borta.png"
+    image: "/images/baigan-borta.png"
   },
   {
     id: "alo-kopi-korma",
@@ -366,7 +366,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Choux fleurs, pomme de terre, petits pois, poudre d'amande et de noix de coco, crème, épices douces et légèrement sucrées.",
     price: 15.90,
     category: "PLATS LÉGUMES (Végétariens)",
-    image: "./images/alo-kopi-korma.png"
+    image: "/images/alo-kopi-korma.png"
   },
   {
     id: "palak-paneer",
@@ -374,7 +374,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Epinards hachés à la crème et aux épices.",
     price: 12.90,
     category: "PLATS LÉGUMES (Végétariens)",
-    image: "./images/palak-paneer.png"
+    image: "/images/palak-paneer.png"
   },
 
   // --- PLATS RIZ ET BIRYANIES ---
@@ -384,7 +384,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Riz basmati au safran, légumes, coriandre fraîche et tomates avec au choix du poulet.",
     price: 17.90,
     category: "PLATS RIZ ET BIRYANIES",
-    image: "./images/biryanie-poulet.png"
+    image: "/images/biryanie-poulet.png"
   },
   {
     id: "biryanie-choix",
@@ -392,7 +392,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Riz basmati au safran, légumes, coriandre fraîche et tomates avec au choix de la dinde, du bœuf ou des crevettes.",
     price: 18.90,
     category: "PLATS RIZ ET BIRYANIES",
-    image: "./images/biryanie-choix.png",
+    image: "/images/biryanie-choix.png",
     options: [
         { title: "Choix", required: true, choices: ["Dinde", "Bœuf", "Crevettes"] }
     ]
@@ -403,7 +403,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Morceaux d'agneau, riz basmati au safran, poudre de noix de cajou, poivrons, coriandre fraîche.",
     price: 20.90,
     category: "PLATS RIZ ET BIRYANIES",
-    image: "./images/sagol-biryanie.png"
+    image: "/images/sagol-biryanie.png"
   },
   {
     id: "sobji-biryanie",
@@ -411,7 +411,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Légumes mixtes, riz basmati au safran, poudre d'amande, coriandre fraîche.",
     price: 16.90,
     category: "PLATS RIZ ET BIRYANIES",
-    image: "./images/sobji-biryanie.png"
+    image: "/images/sobji-biryanie.png"
   },
   {
     id: "galda-chingri-biryanie",
@@ -419,7 +419,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Gambas (16/20) décortiquées, riz basmati au safran, légumes, coriandre fraîche et tomates.",
     price: 21.90,
     category: "PLATS RIZ ET BIRYANIES",
-    image: "./images/galda-chingri-biryanie.png"
+    image: "/images/galda-chingri-biryanie.png"
   },
   {
     id: "biryanie-royal",
@@ -427,7 +427,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Agneau, bœuf, poulet, riz basmati au safran avec des légumes, coriandre fraîche.",
     price: 24.90,
     category: "PLATS RIZ ET BIRYANIES",
-    image: "./images/biryanie-royal.png"
+    image: "/images/biryanie-royal.png"
   },
 
   // --- ACCOMPAGNEMENTS (Pains & Riz) ---
@@ -437,7 +437,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Pâte levée de farine de blé.",
     price: 2.00,
     category: "ACCOMPAGNEMENTS",
-    image: "./images/nan-nature.png"
+    image: "/images/nan-nature.png"
   },
   {
     id: "nan-fromage",
@@ -445,7 +445,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Fourrée au fromage.",
     price: 3.50,
     category: "ACCOMPAGNEMENTS",
-    image: "./images/nan-fromage.png"
+    image: "/images/nan-fromage.png"
   },
   {
     id: "nan-ail-gingembre",
@@ -453,7 +453,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Nan parfumé.",
     price: 4.50,
     category: "ACCOMPAGNEMENTS",
-    image: "./images/nan-ail-gingembre.png",
+    image: "/images/nan-ail-gingembre.png",
     options: [{ title: "Parfum", required: true, choices: ["Ail", "Gingembre"] }]
   },
   {
@@ -462,7 +462,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Fourré poudre de noix de coco, amande, sucre (sucré).",
     price: 5.00,
     category: "ACCOMPAGNEMENTS",
-    image: "./images/nan-bangale.png"
+    image: "/images/nan-bangale.png"
   },
   {
     id: "nan-fromage-ail-gingembre",
@@ -470,7 +470,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Nan au fromage parfumé.",
     price: 5.00,
     category: "ACCOMPAGNEMENTS",
-    image: "./images/nan-fromage-ail-gingembre.png",
+    image: "/images/nan-fromage-ail-gingembre.png",
     options: [{ title: "Parfum", required: true, choices: ["Ail", "Gingembre"] }]
   },
   {
@@ -479,7 +479,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Pain farine complète, grillé au beurre.",
     price: 3.50,
     category: "ACCOMPAGNEMENTS",
-    image: "./images/paratha.png"
+    image: "/images/paratha.png"
   },
   {
     id: "sobji-parata",
@@ -487,7 +487,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Fourrée aux légumes mixtes.",
     price: 5.00,
     category: "ACCOMPAGNEMENTS",
-    image: "./images/sobji-parata.png"
+    image: "/images/sobji-parata.png"
   },
   {
     id: "keema-nan",
@@ -495,7 +495,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Fourré à la viande hachée.",
     price: 5.50,
     category: "ACCOMPAGNEMENTS",
-    image: "./images/keema-nan.png"
+    image: "/images/keema-nan.png"
   },
   {
     id: "riz-nature",
@@ -503,7 +503,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Riz basmati blanc.",
     price: 4.00,
     category: "ACCOMPAGNEMENTS",
-    image: "./images/riz-nature.png"
+    image: "/images/riz-nature.png"
   },
   {
     id: "riz-safran",
@@ -511,7 +511,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Riz basmati parfumé.",
     price: 5.00,
     category: "ACCOMPAGNEMENTS",
-    image: "./images/riz-safran.png"
+    image: "/images/riz-safran.png"
   },
 
   // --- DESSERTS ---
@@ -521,7 +521,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Gâteau de semoule aux fruits secs.",
     price: 6.00,
     category: "DESSERTS",
-    image: "./images/halwa-suji.png"
+    image: "/images/halwa-suji.png"
   },
   {
     id: "kulfi",
@@ -529,7 +529,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Glace indienne maison avec cardamome.",
     price: 7.50,
     category: "DESSERTS",
-    image: "./images/kulfi.png"
+    image: "/images/kulfi.png"
   },
   {
     id: "glace-2-boules",
@@ -537,7 +537,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Glaces.",
     price: 5.90,
     category: "DESSERTS",
-    image: "./images/glace-2-boules.png",
+    image: "/images/glace-2-boules.png",
     options: [{ title: "Parfums", required: true, choices: GLACE_PARFUMS }]
   },
   {
@@ -546,7 +546,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Fruits frais.",
     price: 7.00,
     category: "DESSERTS",
-    image: "./images/salade-fruits.png"
+    image: "/images/salade-fruits.png"
   },
   {
     id: "paiache",
@@ -554,7 +554,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Lait, crème fraîche, poudre de pistache et amande, eau de rose.",
     price: 6.90,
     category: "DESSERTS",
-    image: "./images/paiache.png"
+    image: "/images/paiache.png"
   },
   {
     id: "sorbet-3-boules",
@@ -562,7 +562,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Sorbets.",
     price: 6.90,
     category: "DESSERTS",
-    image: "./images/sorbet-3-boules.png",
+    image: "/images/sorbet-3-boules.png",
     options: [{ title: "Parfums", required: true, choices: SORBET_PARFUMS }]
   },
   {
@@ -571,7 +571,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Pâtisserie maison (boule de lait, sirop au miel).",
     price: 6.00,
     category: "DESSERTS",
-    image: "./images/gulab-jamun.png"
+    image: "/images/gulab-jamun.png"
   },
 
   // --- BOISSONS ---
@@ -581,7 +581,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Boissons fraîches.",
     price: 3.90,
     category: "BOISSONS",
-    image: "./images/soda.png",
+    image: "/images/soda.png",
     options: [
       {
         title: "Choix de la boisson",
@@ -596,7 +596,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Boisson traditionnelle indienne à base de yaourt.",
     price: 5.00,
     category: "BOISSONS",
-    image: "./images/lassi.png",
+    image: "/images/lassi.png",
     options: [
       {
         title: "Parfum",
@@ -618,6 +618,6 @@ export const MENU_ITEMS: MenuItem[] = [
     description: "Bouteille d'eau.",
     price: 3.90,
     category: "BOISSONS",
-    image: "./images/eau.png",
+    image: "/images/eau.png",
   }
 ];
