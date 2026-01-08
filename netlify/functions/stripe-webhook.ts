@@ -1,12 +1,18 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-12-18.acacia',
 });
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASSWORD,
+  },
+});
 
 export const handler = async (event: any) => {
   console.log('=== WEBHOOK CALLED ===');
@@ -15,7 +21,8 @@ export const handler = async (event: any) => {
   console.log('SUPABASE_URL:', process.env.SUPABASE_URL ? 'OK' : 'MISSING');
   console.log('SUPABASE_SERVICE_KEY:', process.env.SUPABASE_SERVICE_KEY ? 'OK' : 'MISSING');
   console.log('STRIPE_WEBHOOK_SECRET:', process.env.STRIPE_WEBHOOK_SECRET ? 'OK' : 'MISSING');
-  console.log('RESEND_API_KEY:', process.env.RESEND_API_KEY ? 'OK' : 'MISSING');
+  console.log('GMAIL_USER:', process.env.GMAIL_USER ? 'OK' : 'MISSING');
+  console.log('GMAIL_PASSWORD:', process.env.GMAIL_PASSWORD ? 'OK' : 'MISSING');
   console.log('RESTAURANT_EMAIL:', process.env.RESTAURANT_EMAIL || 'NOT SET (using default)');
 
   const sig = event.headers['stripe-signature'];
@@ -93,11 +100,9 @@ export const handler = async (event: any) => {
           }`
         ).join('\n');
 
-        const restaurantEmail = process.env.RESTAURANT_EMAIL || 'EMAIL_DU_RESTAURATEUR@example.com';
-
-        const emailResult = await resend.emails.send({
-          from: 'Tigre du Bengale <onboarding@resend.dev>', // Email par défaut de Resend
-          to: [restaurantEmail],
+        const mailOptions = {
+          from: `"Le Tigre du Bengale" <${process.env.GMAIL_USER}>`,
+          to: process.env.RESTAURANT_EMAIL || 'le.tigre.du.bengale1@gmail.com',
           subject: `🔔 Nouvelle commande #${session.id.slice(-8)} - ${metadata.customerName}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -129,9 +134,10 @@ export const handler = async (event: any) => {
               </p>
             </div>
           `,
-        });
+        };
 
-        console.log('Email sent successfully:', emailResult);
+        const emailResult = await transporter.sendMail(mailOptions);
+        console.log('Email sent successfully via Gmail:', emailResult.messageId);
       } catch (emailError: any) {
         console.error('Error sending email:', emailError);
         // On ne fait pas échouer le webhook si l'email échoue
