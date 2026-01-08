@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+import { MENU_PRICES, DELIVERY_FEE } from './menu-prices';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-12-18.acacia',
@@ -26,39 +27,59 @@ export const handler = async (event: any) => {
   }
 
   try {
-    const { cartItems, customerInfo, totalAmount, restaurantId } = JSON.parse(event.body);
+    const { cartItems, customerInfo, restaurantId } = JSON.parse(event.body);
 
-    // Create line items for Stripe
-    const lineItems = cartItems.map((item: any) => ({
-      price_data: {
-        currency: 'eur',
-        product_data: {
-          name: item.name,
-          description: item.selectedOptions 
-            ? Object.entries(item.selectedOptions)
-                .map(([key, value]) => `${key}: ${value}`)
-                .join(', ')
-            : undefined,
-        },
-        unit_amount: Math.round(item.price * 100), // Prix en centimes
-      },
-      quantity: item.quantity,
-    }));
+    // Valider que tous les produits existent dans MENU_PRICES
+    for (const item of cartItems) {
+      if (!MENU_PRICES[item.id]) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: `Produit invalide: ${item.id}` }),
+        };
+      }
+    }
 
-    // Add delivery fee if needed
-    const cartTotal = cartItems.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
-    if (totalAmount > cartTotal) {
-      lineItems.push({
+    // Recalculer les prix côté serveur (IGNORER les prix du frontend)
+    const lineItems = cartItems.map((item: any) => {
+      const securePrice = MENU_PRICES[item.id];
+      return {
         price_data: {
           currency: 'eur',
           product_data: {
-            name: 'Frais de livraison',
+            name: item.name,
+            description: item.selectedOptions 
+              ? Object.entries(item.selectedOptions)
+                  .map(([key, value]) => `${key}: ${value}`)
+                  .join(', ')
+              : undefined,
           },
-          unit_amount: 250, // 2.50€ en centimes
+          unit_amount: Math.round(securePrice * 100), // Prix sécurisé en centimes
         },
-        quantity: 1,
-      });
-    }
+        quantity: item.quantity,
+      };
+    });
+
+    // Calculer le total côté serveur
+    const serverCartTotal = cartItems.reduce((acc: number, item: any) => {
+      const securePrice = MENU_PRICES[item.id];
+      return acc + (securePrice * item.quantity);
+    }, 0);
+
+    // Ajouter les frais de livraison
+    const serverTotalAmount = serverCartTotal + DELIVERY_FEE;
+
+    // Ajouter les frais de livraison aux line items
+    lineItems.push({
+      price_data: {
+        currency: 'eur',
+        product_data: {
+          name: 'Frais de livraison',
+        },
+        unit_amount: Math.round(DELIVERY_FEE * 100), // 2.50€ en centimes
+      },
+      quantity: 1,
+    });
 
     // Create Checkout Session
     const session = await stripe.checkout.sessions.create({
