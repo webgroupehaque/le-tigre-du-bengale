@@ -29,20 +29,36 @@ export const handler = async (event: any) => {
   try {
     const { cartItems, customerInfo, restaurantId } = JSON.parse(event.body);
 
+    // Debug logs
+    console.log('=== DEBUG CHECKOUT ===');
+    console.log('Cart items received:', JSON.stringify(cartItems, null, 2));
+    console.log('Available prices:', Object.keys(MENU_PRICES));
+    console.log('=====================');
+
     // Valider que tous les produits existent dans MENU_PRICES
     for (const item of cartItems) {
       if (!MENU_PRICES[item.id]) {
+        console.error(`INVALID PRODUCT: ${item.id}`);
+        console.error(`Available IDs:`, Object.keys(MENU_PRICES).slice(0, 10));
         return {
           statusCode: 400,
           headers,
-          body: JSON.stringify({ error: `Produit invalide: ${item.id}` }),
+          body: JSON.stringify({ 
+            error: `Produit invalide: ${item.id}. Available IDs: ${Object.keys(MENU_PRICES).slice(0, 5).join(', ')}` 
+          }),
         };
       }
     }
 
     // Recalculer les prix côté serveur (IGNORER les prix du frontend)
     const lineItems = cartItems.map((item: any) => {
+      console.log(`Checking item: ${item.id}, price found: ${MENU_PRICES[item.id]}`);
       const securePrice = MENU_PRICES[item.id];
+      if (!securePrice) {
+        console.error(`INVALID PRODUCT: ${item.id}`);
+        console.error(`Available IDs:`, Object.keys(MENU_PRICES).slice(0, 10));
+        throw new Error(`Invalid product ID: ${item.id}. Available IDs: ${Object.keys(MENU_PRICES).slice(0, 5).join(', ')}`);
+      }
       return {
         price_data: {
           currency: 'eur',
