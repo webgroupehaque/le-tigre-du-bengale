@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { OrderType } from '../types';
+import { OrderType, CartItem } from '../types';
 
 interface CheckoutFormProps {
   isOpen: boolean;
   onClose: () => void;
-  cartItems: Array<{
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
-  }>;
+  cartItems: CartItem[];
   totalAmount: number;
   onSubmit: (customerInfo: CustomerInfo, orderType: OrderType) => void;
   orderType: OrderType;
@@ -39,6 +34,31 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   });
 
   const [errors, setErrors] = useState<Partial<CustomerInfo>>({});
+
+  // Helper to extract price from option string like "Crevettes (19.90€)"
+  // If found, it overrides the base price. If not, returns item.price
+  const getItemPrice = (item: CartItem): number => {
+    let finalPrice = item.price;
+    
+    if (item.selectedOptions) {
+      Object.values(item.selectedOptions).forEach(optionValue => {
+        const val = optionValue as string;
+        const match = val.match(/\(([\d.]+)€\)/);
+        if (match && match[1]) {
+          finalPrice = parseFloat(match[1]);
+        }
+      });
+    }
+    return finalPrice;
+  };
+
+  // Helper function to generate a unique identifier for cart items (ID + options)
+  const getCartItemKey = (item: CartItem): string => {
+    const optionsKey = item.selectedOptions 
+      ? JSON.stringify(item.selectedOptions) 
+      : '';
+    return `${item.id}::${optionsKey}`;
+  };
 
   const validateForm = (): boolean => {
     const newErrors: Partial<CustomerInfo> = {};
@@ -128,12 +148,31 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
             {/* Cart Summary */}
             <div className="mb-6 p-4 bg-bengal-dark/50 rounded-lg border border-orange-900/20">
               <h3 className="font-semibold text-lg mb-3 text-white">Récapitulatif</h3>
-              {cartItems.map((item) => (
-                <div key={item.id} className="flex justify-between text-sm mb-2 text-gray-300">
-                  <span>{item.name} x{item.quantity}</span>
-                  <span className="font-medium text-bengal-gold">{(item.price * item.quantity).toFixed(2)} €</span>
-                </div>
-              ))}
+              {cartItems.map((item) => {
+                const itemPrice = getItemPrice(item);
+                const itemKey = getCartItemKey(item);
+                return (
+                  <div key={itemKey} className="mb-3 pb-3 border-b border-orange-900/20 last:border-0">
+                    <div className="flex justify-between text-sm mb-1 text-gray-300">
+                      <span className="font-bold text-white">{item.name} x{item.quantity}</span>
+                      <span className="font-medium text-bengal-gold">{(itemPrice * item.quantity).toFixed(2)} €</span>
+                    </div>
+                    {item.selectedOptions && (
+                      <div className="text-xs text-gray-400 mt-1 space-y-0.5">
+                        {Object.entries(item.selectedOptions).map(([key, value]) => {
+                          const val = value as string;
+                          const displayValue = val.replace(/\(([\d.]+)€\)/, '').trim();
+                          return (
+                            <p key={key}>
+                              <span className="text-bengal-spice">{key}:</span> {displayValue || val}
+                            </p>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
               <div className="border-t border-orange-900/30 mt-3 pt-3 flex justify-between font-bold text-lg text-white">
                 <span>Total</span>
                 <span className="text-bengal-gold">{totalAmount.toFixed(2)} €</span>

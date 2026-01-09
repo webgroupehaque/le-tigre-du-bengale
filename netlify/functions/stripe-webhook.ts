@@ -97,15 +97,36 @@ export const handler = async (event: any) => {
 
       console.log('Order saved successfully:', data);
 
+      // Helper function to extract price from options (like "Crevettes (19.90€)")
+      const getItemPriceFromOptions = (item: any): number => {
+        let finalPrice = item.price || 0;
+        if (item.selectedOptions) {
+          Object.values(item.selectedOptions).forEach((optionValue: any) => {
+            const val = String(optionValue);
+            const match = val.match(/\(([\d.]+)€\)/);
+            if (match && match[1]) {
+              finalPrice = parseFloat(match[1]);
+            }
+          });
+        }
+        return finalPrice;
+      };
+
       // Envoyer email au restaurateur
       try {
-        const itemsList = orderData.map((item: any) => 
-          `- ${item.name} x${item.quantity} (${(item.price * item.quantity).toFixed(2)}€)${
-            item.selectedOptions 
-              ? '\n  Options: ' + Object.entries(item.selectedOptions).map(([k, v]) => `${k}: ${v}`).join(', ')
-              : ''
-          }`
-        ).join('\n');
+        const itemsList = orderData.map((item: any) => {
+          const itemPrice = getItemPriceFromOptions(item);
+          const optionsDisplay = item.selectedOptions 
+            ? '\n  Options: ' + Object.entries(item.selectedOptions)
+                .map(([k, v]) => {
+                  // Remove price from display for cleaner look
+                  const val = String(v);
+                  return `${k}: ${val.replace(/\(([\d.]+)€\)/, '').trim()}`;
+                })
+                .join(', ')
+            : '';
+          return `- ${item.name} x${item.quantity} (${(itemPrice * item.quantity).toFixed(2)}€)${optionsDisplay}`;
+        }).join('\n');
 
         const mailOptions = {
           from: `"Le Tigre du Bengale" <${process.env.GMAIL_USER}>`,
@@ -158,13 +179,23 @@ export const handler = async (event: any) => {
 
       // Envoyer email de confirmation au client
       try {
-        const clientItemsList = orderData.map((item: any) => 
-          `<tr>
-            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${item.name} ${item.selectedOptions ? '<br/><span style="font-size: 12px; color: #6b7280;">' + Object.entries(item.selectedOptions).map(([k, v]) => `${k}: ${v}`).join(', ') + '</span>' : ''}</td>
+        const clientItemsList = orderData.map((item: any) => {
+          const itemPrice = getItemPriceFromOptions(item);
+          const optionsDisplay = item.selectedOptions 
+            ? '<br/><span style="font-size: 12px; color: #6b7280;">' + Object.entries(item.selectedOptions)
+                .map(([k, v]) => {
+                  // Remove price from display for cleaner look
+                  const val = String(v);
+                  return `${k}: ${val.replace(/\(([\d.]+)€\)/, '').trim()}`;
+                })
+                .join(', ') + '</span>'
+            : '';
+          return `<tr>
+            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${item.name}${optionsDisplay}</td>
             <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: center;">x${item.quantity}</td>
-            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: right;">${(item.price * item.quantity).toFixed(2)}€</td>
-          </tr>`
-        ).join('');
+            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: right;">${(itemPrice * item.quantity).toFixed(2)}€</td>
+          </tr>`;
+        }).join('');
 
         const clientMailOptions = {
           from: `"Le Tigre du Bengale" <${process.env.GMAIL_USER}>`,

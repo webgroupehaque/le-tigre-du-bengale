@@ -23,23 +23,54 @@ function App() {
     }
   }, []);
 
+  // Helper function to generate a unique identifier for cart items (ID + options)
+  const getCartItemKey = (item: CartItem): string => {
+    const optionsKey = item.selectedOptions 
+      ? JSON.stringify(item.selectedOptions) 
+      : '';
+    return `${item.id}::${optionsKey}`;
+  };
+
+  // Helper to extract price from option string like "Crevettes (19.90€)"
+  // If found, it overrides the base price. If not, returns item.price
+  const getItemPrice = (item: CartItem): number => {
+    let finalPrice = item.price;
+    
+    if (item.selectedOptions) {
+      Object.values(item.selectedOptions).forEach(optionValue => {
+        const val = optionValue as string;
+        const match = val.match(/\(([\d.]+)€\)/);
+        if (match && match[1]) {
+          finalPrice = parseFloat(match[1]);
+        }
+      });
+    }
+    return finalPrice;
+  };
+
   const addToCart = (item: CartItem) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((i) => i.id === item.id);
+      const itemKey = getCartItemKey(item);
+      const existingItem = prevCart.find((i) => getCartItemKey(i) === itemKey);
+      
       if (existingItem) {
+        // Same item with same options: increment quantity
         return prevCart.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          getCartItemKey(i) === itemKey 
+            ? { ...i, quantity: i.quantity + 1 } 
+            : i
         );
       }
+      // Different item or different options: add as new item
       return [...prevCart, item];
     });
     setIsCartOpen(true);
   };
 
-  const updateQuantity = (id: string, delta: number) => {
+  const updateQuantity = (itemKey: string, delta: number) => {
     setCart((prevCart) => {
       return prevCart.map((item) => {
-        if (item.id === id) {
+        if (getCartItemKey(item) === itemKey) {
           return { ...item, quantity: Math.max(0, item.quantity + delta) };
         }
         return item;
@@ -47,14 +78,14 @@ function App() {
     });
   };
 
-  const removeFromCart = (id: string) => {
-     setCart((prevCart) => prevCart.filter(item => item.id !== id));
+  const removeFromCart = (itemKey: string) => {
+     setCart((prevCart) => prevCart.filter(item => getCartItemKey(item) !== itemKey));
   };
 
   const handleCheckoutSubmit = async (customerInfo: CustomerInfo, submittedOrderType: OrderType) => {
     try {
-      // Calculer le total
-      const cartTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+      // Calculer le total avec getItemPrice pour prendre en compte les suppléments
+      const cartTotal = cart.reduce((acc, item) => acc + (getItemPrice(item) * item.quantity), 0);
       const deliveryFee = submittedOrderType === 'delivery' ? 2.50 : 0;
       const totalAmount = cartTotal + deliveryFee;
 
@@ -133,7 +164,7 @@ function App() {
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
         cartItems={cart}
-        totalAmount={cart.reduce((acc, item) => acc + (item.price * item.quantity), 0) + (orderType === 'delivery' ? 2.50 : 0)}
+        totalAmount={cart.reduce((acc, item) => acc + (getItemPrice(item) * item.quantity), 0) + (orderType === 'delivery' ? 2.50 : 0)}
         onSubmit={handleCheckoutSubmit}
         orderType={orderType}
       />

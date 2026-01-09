@@ -6,8 +6,8 @@ interface CartSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   cart: CartItem[];
-  updateQuantity: (id: string, delta: number) => void;
-  removeFromCart: (id: string) => void;
+  updateQuantity: (itemKey: string, delta: number) => void;
+  removeFromCart: (itemKey: string) => void;
   onCheckout: () => void;
   orderType: OrderType;
   setOrderType: (type: OrderType) => void;
@@ -23,6 +23,14 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
   orderType,
   setOrderType
 }) => {
+
+  // Helper function to generate a unique identifier for cart items (ID + options)
+  const getCartItemKey = (item: CartItem): string => {
+    const optionsKey = item.selectedOptions 
+      ? JSON.stringify(item.selectedOptions) 
+      : '';
+    return `${item.id}::${optionsKey}`;
+  };
 
   // Helper to extract price from option string like "Rose (7.00€)"
   // If found, it overrides the base price. If not, returns item.price
@@ -118,10 +126,11 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
 
               {/* Items List */}
               <div className="space-y-4">
-                {cart.map((item, index) => {
+                {cart.map((item) => {
                   const itemPrice = getItemPrice(item);
+                  const itemKey = getCartItemKey(item);
                   return (
-                    <div key={`${item.id}-${index}`} className="bg-bengal-dark/50 p-4 rounded-lg border border-orange-900/10 flex justify-between items-start group hover:border-bengal-gold/30 transition-colors">
+                    <div key={itemKey} className="bg-bengal-dark/50 p-4 rounded-lg border border-orange-900/10 flex justify-between items-start group hover:border-bengal-gold/30 transition-colors">
                         <div className="flex-1">
                         <h4 className="text-white font-bold mb-1">{item.name}</h4>
                         
@@ -129,8 +138,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
                         {item.selectedOptions && (
                             <div className="text-xs text-gray-400 mb-2 space-y-1 border-l-2 border-bengal-spice/50 pl-2">
                                 {Object.entries(item.selectedOptions).map(([key, value]) => {
-                                    // Remove the price tag from display in the cart list for cleaner look, or keep it?
-                                    // Let's keep it but maybe format it.
+                                    // Remove the price tag from display in the cart list for cleaner look
                                     const val = value as string;
                                     const displayValue = val.replace(/\(([\d.]+)€\)/, '');
                                     return (
@@ -147,7 +155,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
                         
                         <div className="flex flex-col items-end space-y-3">
                             <button 
-                            onClick={() => removeFromCart(item.id)}
+                            onClick={() => removeFromCart(itemKey)}
                             className="text-red-500/50 hover:text-red-500 transition-colors p-1"
                             >
                             <Trash2 size={16} />
@@ -155,14 +163,14 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
                             
                             <div className="flex items-center space-x-3 bg-bengal-card rounded px-2 py-1 border border-white/5">
                             <button 
-                                onClick={() => updateQuantity(item.id, -1)}
+                                onClick={() => updateQuantity(itemKey, -1)}
                                 className="p-1 text-gray-400 hover:text-white transition-colors"
                             >
                                 <Minus size={14} />
                             </button>
                             <span className="text-sm font-bold text-white w-4 text-center">{item.quantity}</span>
                             <button 
-                                onClick={() => updateQuantity(item.id, 1)}
+                                onClick={() => updateQuantity(itemKey, 1)}
                                 className="p-1 text-gray-400 hover:text-white transition-colors"
                             >
                                 <Plus size={14} />
