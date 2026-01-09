@@ -2,12 +2,34 @@ import React, { useEffect, useState } from 'react';
 import { Check } from 'lucide-react';
 
 const Success: React.FC = () => {
-  const [sessionId, setSessionId] = useState<string>('');
+  const [orderNumber, setOrderNumber] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('session_id');
-    if (id) setSessionId(id);
+    const fetchOrderNumber = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get('session_id');
+      
+      if (sessionId) {
+        try {
+          // Appeler une fonction Netlify pour récupérer le numéro de commande
+          const response = await fetch(`/.netlify/functions/get-order-number?session_id=${sessionId}`);
+          const data = await response.json();
+          
+          if (data.orderNumber) {
+            setOrderNumber(data.orderNumber);
+          } else {
+            setOrderNumber('####'); // Fallback si erreur
+          }
+        } catch (error) {
+          console.error('Error fetching order number:', error);
+          setOrderNumber('####');
+        }
+      }
+      setLoading(false);
+    };
+
+    fetchOrderNumber();
   }, []);
 
   return (
@@ -25,12 +47,21 @@ const Success: React.FC = () => {
           Votre paiement a été effectué avec succès. Vous recevrez un email de confirmation à l'adresse indiquée.
         </p>
         
-        <div className="bg-bengal-dark/50 p-4 rounded border border-orange-900/20 mb-6">
-          <p className="text-sm text-gray-400 mb-1">Numéro de transaction</p>
-          <p className="text-xs text-bengal-gold font-mono break-all">
-            {sessionId || 'Chargement...'}
-          </p>
-        </div>
+        {loading ? (
+          <div className="bg-bengal-dark/50 p-4 rounded border border-orange-900/20 mb-6">
+            <p className="text-sm text-gray-400 mb-1">Numéro de commande</p>
+            <p className="text-xl text-bengal-gold font-bold animate-pulse">
+              Chargement...
+            </p>
+          </div>
+        ) : (
+          <div className="bg-bengal-dark/50 p-4 rounded border border-orange-900/20 mb-6">
+            <p className="text-sm text-gray-400 mb-1">Numéro de commande</p>
+            <p className="text-3xl text-bengal-gold font-bold font-mono">
+              #{orderNumber}
+            </p>
+          </div>
+        )}
 
         <p className="text-gray-400 text-sm mb-6">
           Le restaurateur a été notifié de votre commande et la prépare actuellement.

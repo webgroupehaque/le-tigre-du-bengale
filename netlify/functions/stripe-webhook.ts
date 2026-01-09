@@ -65,7 +65,7 @@ export const handler = async (event: any) => {
       );
       console.log('Supabase client created');
 
-      const orderToInsert = {
+      const orderToInsert: any = {
         restaurant_id: metadata.restaurantId,
         customer_name: metadata.customerName,
         customer_email: session.customer_email,
@@ -77,6 +77,12 @@ export const handler = async (event: any) => {
         stripe_payment_id: session.payment_intent as string,
         order_type: metadata.orderType || 'delivery',
       };
+
+      // Stocker aussi le session_id si la colonne existe (pour faciliter la recherche)
+      // Si la colonne n'existe pas, on utilisera l'email + date comme fallback
+      if (session.id) {
+        orderToInsert.stripe_session_id = session.id;
+      }
 
       console.log('Attempting to insert order:', JSON.stringify(orderToInsert, null, 2));
 
@@ -148,6 +154,108 @@ export const handler = async (event: any) => {
       } catch (emailError: any) {
         console.error('Error sending email:', emailError);
         // On ne fait pas échouer le webhook si l'email échoue
+      }
+
+      // Envoyer email de confirmation au client
+      try {
+        const clientItemsList = orderData.map((item: any) => 
+          `<tr>
+            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${item.name} ${item.selectedOptions ? '<br/><span style="font-size: 12px; color: #6b7280;">' + Object.entries(item.selectedOptions).map(([k, v]) => `${k}: ${v}`).join(', ') + '</span>' : ''}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: center;">x${item.quantity}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: right;">${(item.price * item.quantity).toFixed(2)}€</td>
+          </tr>`
+        ).join('');
+
+        const clientMailOptions = {
+          from: `"Le Tigre du Bengale" <${process.env.GMAIL_USER}>`,
+          to: session.customer_email!,
+          subject: `✅ Confirmation de votre commande - Le Tigre du Bengale`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
+              <div style="background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); padding: 30px; text-align: center;">
+                <h1 style="color: #ffffff; margin: 0; font-size: 28px;">🍛 Le Tigre du Bengale</h1>
+                <p style="color: #fed7aa; margin: 10px 0 0 0; font-size: 14px;">Restaurant Indien - Nancy</p>
+              </div>
+
+              <div style="padding: 30px;">
+                <h2 style="color: #ea580c; margin-top: 0;">Merci pour votre commande !</h2>
+                
+                <div style="background: #dcfce7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a34a;">
+                  <p style="margin: 0; color: #166534; font-weight: bold; font-size: 16px;">✅ Paiement confirmé</p>
+                  <p style="margin: 5px 0 0 0; color: #166534; font-size: 14px;">Votre commande a bien été enregistrée et sera préparée dans les plus brefs délais.</p>
+                </div>
+
+                <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                  <p style="margin: 0; font-weight: bold; color: #92400e; font-size: 18px;">
+                    ${metadata.orderType === 'delivery' ? '🚲 LIVRAISON' : '🏠 À EMPORTER'}
+                  </p>
+                  ${metadata.orderType === 'pickup' ? '<p style="margin: 5px 0 0 0; color: #92400e; font-size: 14px;">Votre commande sera prête dans 30-45 minutes</p>' : ''}
+                </div>
+
+                <h3 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Détails de votre commande</h3>
+                
+                <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                  <thead>
+                    <tr style="background: #f9fafb;">
+                      <th style="padding: 10px; text-align: left; color: #6b7280; font-size: 12px; text-transform: uppercase;">Article</th>
+                      <th style="padding: 10px; text-align: center; color: #6b7280; font-size: 12px; text-transform: uppercase;">Qté</th>
+                      <th style="padding: 10px; text-align: right; color: #6b7280; font-size: 12px; text-transform: uppercase;">Prix</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${clientItemsList}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="2" style="padding: 15px 10px 5px 10px; text-align: right; font-weight: bold;">Sous-total :</td>
+                      <td style="padding: 15px 10px 5px 10px; text-align: right;">${((session.amount_total! / 100) - (metadata.orderType === 'delivery' ? 2.50 : 0)).toFixed(2)}€</td>
+                    </tr>
+                    ${metadata.orderType === 'delivery' ? `
+                    <tr>
+                      <td colspan="2" style="padding: 5px 10px; text-align: right;">Frais de livraison :</td>
+                      <td style="padding: 5px 10px; text-align: right;">2.50€</td>
+                    </tr>
+                    ` : ''}
+                    <tr style="background: #f9fafb;">
+                      <td colspan="2" style="padding: 10px; text-align: right; font-weight: bold; font-size: 18px; color: #ea580c;">Total :</td>
+                      <td style="padding: 10px; text-align: right; font-weight: bold; font-size: 18px; color: #ea580c;">${(session.amount_total! / 100).toFixed(2)}€</td>
+                    </tr>
+                  </tfoot>
+                </table>
+
+                ${metadata.orderType === 'delivery' ? `
+                <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <h4 style="margin: 0 0 10px 0; color: #1f2937;">📍 Adresse de livraison</h4>
+                  <p style="margin: 0; color: #4b5563;">${metadata.customerAddress}</p>
+                </div>
+                ` : `
+                <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <h4 style="margin: 0 0 10px 0; color: #1f2937;">📍 Adresse du restaurant</h4>
+                  <p style="margin: 0; color: #4b5563;">19 Rue des Maréchaux<br/>54000 Nancy</p>
+                </div>
+                `}
+
+                <div style="background: #eff6ff; padding: 20px; border-radius: 8px; margin: 30px 0; border-left: 4px solid #3b82f6;">
+                  <p style="margin: 0; color: #1e40af; font-size: 14px;">
+                    <strong>📞 Besoin d'aide ?</strong><br/>
+                    Contactez-nous au ${metadata.customerPhone} ou répondez directement à cet email.
+                  </p>
+                </div>
+
+                <p style="text-align: center; color: #9ca3af; font-size: 12px; margin-top: 40px;">
+                  Merci de votre confiance !<br/>
+                  L'équipe du Tigre du Bengale
+                </p>
+              </div>
+            </div>
+          `,
+        };
+
+        await transporter.sendMail(clientMailOptions);
+        console.log('Confirmation email sent to client:', session.customer_email);
+      } catch (clientEmailError: any) {
+        console.error('Error sending client email:', clientEmailError);
+        // Ne pas faire échouer le webhook
       }
 
       return { statusCode: 200, body: 'Order saved' };
