@@ -86,17 +86,51 @@ const MenuComposer: React.FC<MenuComposerProps> = ({ item, isOpen, onClose, onCo
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {currentOption.choices.map((choice) => {
-                        // Extract Name and Price if formatted as "Name (Price)"
-                        const match = choice.match(/(.*?)\s*(\(.*\))$/);
-                        const displayName = match ? match[1] : choice;
-                        const displayPrice = match ? match[2].replace('(', '').replace(')', '') : null;
+                        // Calculate price for meat options with supplements
+                        let displayName = choice;
+                        let displayPrice: string | null = null;
+                        
+                        // Check if this is a meat option with supplement (Crevettes or Agneau)
+                        const isMeatWithSupplement = choice === "Crevettes" || choice === "Agneau";
+                        const isMeatOption = currentOption.title === "Choix de la viande";
+                        
+                        if (isMeatOption) {
+                            if (isMeatWithSupplement) {
+                                // Calculate total price: base price + 2.00€ supplement
+                                const totalPrice = (item.price + 2.00).toFixed(2);
+                                displayPrice = `${totalPrice}€`;
+                                displayName = choice;
+                            } else {
+                                // For regular meat options, show base price (but don't store it in the value)
+                                displayPrice = `${item.price.toFixed(2)}€`;
+                                displayName = choice;
+                            }
+                        } else {
+                            // Extract Name and Price if already formatted as "Name (Price)"
+                            const match = choice.match(/(.*?)\s*(\(.*\))$/);
+                            if (match) {
+                                displayName = match[1];
+                                displayPrice = match[2].replace('(', '').replace(')', '');
+                            }
+                        }
+
+                        // Format choice value to include price ONLY if it's a meat option with supplement
+                        // This ensures getItemPrice in CartSidebar will use the correct price
+                        const choiceValue = (isMeatOption && isMeatWithSupplement) 
+                            ? `${choice} (${displayPrice})`
+                            : choice;
+
+                        // Check if this choice is selected (handle both with and without price)
+                        const isSelected = selections[currentOption.title] === choiceValue || 
+                                          selections[currentOption.title] === choice ||
+                                          (selections[currentOption.title] && selections[currentOption.title].startsWith(choice + ' ('));
 
                         return (
                           <button
                               key={choice}
-                              onClick={() => handleSelect(choice)}
+                              onClick={() => handleSelect(choiceValue)}
                               className={`p-4 rounded-lg border text-left transition-all duration-200 flex justify-between items-center group ${
-                                  selections[currentOption.title] === choice
+                                  isSelected
                                   ? 'bg-bengal-gold text-bengal-dark border-bengal-gold shadow-[0_0_15px_rgba(245,158,11,0.3)]'
                                   : 'bg-bengal-card/50 border-white/10 text-gray-300 hover:border-bengal-gold/50 hover:bg-bengal-card'
                               }`}
@@ -104,12 +138,12 @@ const MenuComposer: React.FC<MenuComposerProps> = ({ item, isOpen, onClose, onCo
                               <div className="flex flex-col">
                                 <span className="font-bold">{displayName}</span>
                                 {displayPrice && (
-                                  <span className={`text-xs mt-1 lowercase ${selections[currentOption.title] === choice ? 'text-bengal-dark/80 font-bold' : 'text-bengal-gold'}`}>
+                                  <span className={`text-xs mt-1 lowercase ${isSelected ? 'text-bengal-dark/80 font-bold' : 'text-bengal-gold'}`}>
                                     {displayPrice}
                                   </span>
                                 )}
                               </div>
-                              {selections[currentOption.title] === choice && <Check size={18} />}
+                              {isSelected && <Check size={18} />}
                           </button>
                         );
                     })}

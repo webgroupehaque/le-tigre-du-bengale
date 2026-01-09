@@ -50,15 +50,34 @@ export const handler = async (event: any) => {
       }
     }
 
+    // Helper function to calculate price with meat supplements
+    const calculateItemPrice = (item: any): number => {
+      const basePrice = MENU_PRICES[item.id];
+      if (!basePrice) {
+        throw new Error(`Invalid product ID: ${item.id}`);
+      }
+
+      // Check if item has meat option with supplement (Crevettes or Agneau)
+      if (item.selectedOptions) {
+        for (const optionValue of Object.values(item.selectedOptions)) {
+          const val = optionValue as string;
+          // Check if option contains "Crevettes" or "Agneau" (with or without price in parentheses)
+          if (val.includes('Crevettes') || val.includes('Agneau')) {
+            // Add 2.00€ supplement for Crevettes or Agneau
+            return basePrice + 2.00;
+          }
+        }
+      }
+
+      return basePrice;
+    };
+
     // Recalculer les prix côté serveur (IGNORER les prix du frontend)
     const lineItems = cartItems.map((item: any) => {
-      console.log(`Checking item: ${item.id}, price found: ${MENU_PRICES[item.id]}`);
-      const securePrice = MENU_PRICES[item.id];
-      if (!securePrice) {
-        console.error(`INVALID PRODUCT: ${item.id}`);
-        console.error(`Available IDs:`, Object.keys(MENU_PRICES).slice(0, 10));
-        throw new Error(`Invalid product ID: ${item.id}. Available IDs: ${Object.keys(MENU_PRICES).slice(0, 5).join(', ')}`);
-      }
+      console.log(`Checking item: ${item.id}, base price: ${MENU_PRICES[item.id]}`);
+      const securePrice = calculateItemPrice(item);
+      console.log(`Final price for ${item.id}: ${securePrice}€`);
+      
       return {
         price_data: {
           currency: 'eur',
@@ -66,7 +85,11 @@ export const handler = async (event: any) => {
             name: item.name,
             description: item.selectedOptions 
               ? Object.entries(item.selectedOptions)
-                  .map(([key, value]) => `${key}: ${value}`)
+                  .map(([key, value]) => {
+                    // Remove price from display in description
+                    const val = value as string;
+                    return `${key}: ${val.replace(/\(([\d.]+)€\)/, '').trim()}`;
+                  })
                   .join(', ')
               : undefined,
           },
@@ -76,9 +99,9 @@ export const handler = async (event: any) => {
       };
     });
 
-    // Calculer le total côté serveur
+    // Calculer le total côté serveur (avec suppléments si applicable)
     const serverCartTotal = cartItems.reduce((acc: number, item: any) => {
-      const securePrice = MENU_PRICES[item.id];
+      const securePrice = calculateItemPrice(item);
       return acc + (securePrice * item.quantity);
     }, 0);
 

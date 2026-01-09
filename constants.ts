@@ -28,8 +28,8 @@ const MEAT_OPTIONS = [
   "Dinde",
   "Bœuf",
   "Poisson",
-  "Crevettes (+2.00€ sur place)",
-  "Agneau (+2.00€ sur place)"
+  "Crevettes",
+  "Agneau"
 ];
 
 const GLACE_PARFUMS = ["Vanille", "Chocolat", "Café", "Fraise", "Citron"];
