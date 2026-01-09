@@ -32,8 +32,8 @@ const MEAT_OPTIONS = [
   "Agneau"
 ];
 
-const GLACE_PARFUMS = ["Vanille", "Chocolat", "Café", "Fraise", "Citron"];
-const SORBET_PARFUMS = ["Citron", "Fraise", "Mangue", "Framboise", "Cassis"];
+const GLACE_PARFUMS = ["Vanille", "Chocolat", "Café", "Fraise", "Citron", "Pistache", "Caramel"];
+const SORBET_PARFUMS = ["Citron", "Fraise", "Mangue", "Framboise", "Cassis", "Passion"];
 
 export const MENU_ITEMS: MenuItem[] = [
   // --- ENTRÉES - Les Salades ---
@@ -538,7 +538,18 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 5.90,
     category: "DESSERTS",
     image: "/images/glace-2-boules.png",
-    options: [{ title: "Parfums", required: true, choices: GLACE_PARFUMS }]
+    options: [
+      {
+        title: "Boule 1",
+        required: true,
+        choices: GLACE_PARFUMS
+      },
+      {
+        title: "Boule 2",
+        required: true,
+        choices: GLACE_PARFUMS
+      }
+    ]
   },
   {
     id: "salade-fruits",
@@ -563,7 +574,23 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 6.90,
     category: "DESSERTS",
     image: "/images/sorbet-3-boules.png",
-    options: [{ title: "Parfums", required: true, choices: SORBET_PARFUMS }]
+    options: [
+      {
+        title: "Boule 1",
+        required: true,
+        choices: SORBET_PARFUMS
+      },
+      {
+        title: "Boule 2",
+        required: true,
+        choices: SORBET_PARFUMS
+      },
+      {
+        title: "Boule 3",
+        required: true,
+        choices: SORBET_PARFUMS
+      }
+    ]
   },
   {
     id: "gulab-jamun",
