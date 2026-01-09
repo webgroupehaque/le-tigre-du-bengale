@@ -196,23 +196,25 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
               </div>
 
-              <div>
-                <label htmlFor="address" className="block text-sm font-medium text-gray-400 mb-1">
-                  Adresse de livraison {orderType === 'delivery' ? '*' : '(optionnel si à emporter)'}
-                </label>
-                <textarea
-                  id="address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  rows={3}
-                  className={`w-full px-4 py-2 bg-bengal-dark/50 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-bengal-gold focus:ring-2 focus:ring-bengal-gold/50 transition-colors resize-none ${
-                    errors.address ? 'border-red-500/50' : 'border-orange-900/20'
-                  }`}
-                  placeholder="123 Rue de la République, 54000 Nancy"
-                />
-                {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
-              </div>
+              {orderType === 'delivery' && (
+                <div>
+                  <label htmlFor="address" className="block text-sm font-medium text-gray-400 mb-1">
+                    Adresse de livraison *
+                  </label>
+                  <textarea
+                    id="address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    rows={3}
+                    className={`w-full px-4 py-2 bg-bengal-dark/50 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-bengal-gold focus:ring-2 focus:ring-bengal-gold/50 transition-colors resize-none ${
+                      errors.address ? 'border-red-500/50' : 'border-orange-900/20'
+                    }`}
+                    placeholder="123 Rue de la République, 54000 Nancy"
+                  />
+                  {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
+                </div>
+              )}
 
               <div className="flex gap-3 pt-4">
                 <button

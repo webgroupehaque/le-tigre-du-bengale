@@ -238,7 +238,7 @@ export const handler = async (event: any) => {
                 <div style="background: #eff6ff; padding: 20px; border-radius: 8px; margin: 30px 0; border-left: 4px solid #3b82f6;">
                   <p style="margin: 0; color: #1e40af; font-size: 14px;">
                     <strong>📞 Besoin d'aide ?</strong><br/>
-                    Contactez-nous au ${metadata.customerPhone} ou répondez directement à cet email.
+                    Contactez-nous au 03 83 22 88 31 ou répondez directement à cet email.
                   </p>
                 </div>
 
