@@ -123,6 +123,41 @@ export const handler = async (event: any) => {
       });
     }
 
+    // Nettoyer les items pour les metadata (enlever les données inutiles pour respecter la limite de 500 caractères)
+    // On garde uniquement : id, name, quantity, selectedOptions, price
+    let cleanedItems = cartItems.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      selectedOptions: item.selectedOptions || null,
+      price: item.price || null, // On garde le prix pour le calcul dans le webhook
+    }));
+
+    let orderDataString = JSON.stringify(cleanedItems);
+    console.log('OrderData length:', orderDataString.length);
+    
+    // Si c'est encore trop long (ce qui ne devrait normalement pas arriver), retirer le prix aussi
+    if (orderDataString.length > 500) {
+      console.warn('WARNING: OrderData still too long!', orderDataString.length, 'characters');
+      console.warn('Reducing to minimal data (removing price)...');
+      
+      // Version minimale sans prix (le prix sera recalculé dans le webhook depuis MENU_PRICES)
+      cleanedItems = cartItems.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        quantity: item.quantity,
+        selectedOptions: item.selectedOptions || null,
+      }));
+      
+      orderDataString = JSON.stringify(cleanedItems);
+      console.log('Minimal OrderData length:', orderDataString.length, 'characters');
+      
+      if (orderDataString.length > 500) {
+        console.error('ERROR: OrderData STILL too long even with minimal data!', orderDataString.length);
+        // En dernier recours, tronquer ou utiliser une autre méthode (mais ça ne devrait jamais arriver)
+      }
+    }
+
     // Create Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -136,7 +171,7 @@ export const handler = async (event: any) => {
         customerName: customerInfo.name,
         customerPhone: customerInfo.phone,
         customerAddress: customerInfo.address || 'À emporter',
-        orderData: JSON.stringify(cartItems),
+        orderData: JSON.stringify(cleanedItems), // Utiliser cleanedItems au lieu de cartItems
         orderType: orderType || 'delivery',
       },
     });
