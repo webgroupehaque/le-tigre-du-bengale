@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
+import { MENU_PRICES } from './menu-prices';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-12-18.acacia',
@@ -97,18 +98,68 @@ export const handler = async (event: any) => {
 
       console.log('Order saved successfully:', data);
 
-      // Helper function to extract price from options (like "Crevettes (19.90€)")
+      // Helper function to calculate price from MENU_PRICES and options
+      // Same logic as calculateItemPrice in create-checkout-session.ts
       const getItemPriceFromOptions = (item: any): number => {
-        let finalPrice = item.price || 0;
+        // 1. Récupérer le prix de base depuis MENU_PRICES (source de vérité)
+        const basePrice = MENU_PRICES[item.id];
+        if (!basePrice) {
+          console.warn(`Price not found in MENU_PRICES for item ${item.id}, using item.price or 0`);
+          // Fallback: utiliser item.price si présent, sinon 0
+          const fallbackPrice = item.price || 0;
+          console.log(`Price calculation for ${item.name}:`, {
+            basePrice: 'NOT FOUND',
+            itemPrice: item.price,
+            selectedOptions: item.selectedOptions,
+            finalPrice: fallbackPrice
+          });
+          return fallbackPrice;
+        }
+
+        let finalPrice = basePrice;
+
+        // 2. Vérifier les options sélectionnées
         if (item.selectedOptions) {
-          Object.values(item.selectedOptions).forEach((optionValue: any) => {
+          for (const optionValue of Object.values(item.selectedOptions)) {
             const val = String(optionValue);
+            
+            // PRIORITÉ 1 : Extraire le prix formaté "(XX.XX€)" si présent (plus précis)
             const match = val.match(/\(([\d.]+)€\)/);
             if (match && match[1]) {
               finalPrice = parseFloat(match[1]);
+              console.log(`Price calculation for ${item.name}:`, {
+                basePrice: basePrice,
+                itemPrice: item.price,
+                selectedOptions: item.selectedOptions,
+                extractedPrice: finalPrice,
+                finalPrice: finalPrice
+              });
+              return finalPrice;
             }
-          });
+            
+            // PRIORITÉ 2 : Vérifier si l'option contient "Crevettes" ou "Agneau" (supplément +2€)
+            // Seulement si aucun prix formaté n'a été trouvé
+            if (val.includes('Crevettes') || val.includes('Agneau')) {
+              finalPrice = basePrice + 2.00;
+              console.log(`Price calculation for ${item.name}:`, {
+                basePrice: basePrice,
+                itemPrice: item.price,
+                selectedOptions: item.selectedOptions,
+                supplement: '+2.00€ for Crevettes/Agneau',
+                finalPrice: finalPrice
+              });
+              return finalPrice;
+            }
+          }
         }
+
+        console.log(`Price calculation for ${item.name}:`, {
+          basePrice: basePrice,
+          itemPrice: item.price,
+          selectedOptions: item.selectedOptions || 'none',
+          finalPrice: finalPrice
+        });
+
         return finalPrice;
       };
 
