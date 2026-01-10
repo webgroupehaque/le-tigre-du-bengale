@@ -11,6 +11,17 @@ interface OrderProps {
 const Order: React.FC<OrderProps> = ({ addToCart }) => {
   const [activeCategory, setActiveCategory] = useState(MENU_CATEGORIES[0]);
   const [composingItem, setComposingItem] = useState<MenuItem | null>(null);
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+  const [errorImages, setErrorImages] = useState<Set<string>>(new Set());
+
+  const handleImageLoad = (imageId: string) => {
+    setLoadedImages(prev => new Set(prev).add(imageId));
+  };
+
+  const handleImageError = (imageId: string) => {
+    setLoadedImages(prev => new Set(prev).add(imageId)); // Marquer comme "traité" pour enlever le placeholder de chargement
+    setErrorImages(prev => new Set(prev).add(imageId)); // Marquer comme erreur pour afficher le placeholder d'erreur
+  };
 
   // Handle scroll spy to update active category
   useEffect(() => {
@@ -89,22 +100,36 @@ const Order: React.FC<OrderProps> = ({ addToCart }) => {
                         
                         {/* Image Area */}
                         <div className="h-48 bg-bengal-dark relative overflow-hidden group-hover:opacity-90 transition-opacity">
-                            <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-600 bg-black/40 placeholder-container">
-                               {/* Generic Placeholder Icon if image fails or is missing */}
-                               <div className="w-16 h-16 rounded-full border-2 border-gray-600 flex items-center justify-center mb-2">
-                                  <span className="font-serif text-2xl italic text-gray-500">Img</span>
-                               </div>
-                            </div>
+                            {/* Placeholder de chargement (s'affiche seulement si image existe, pas encore chargée, et pas d'erreur) */}
+                            {item.image && !loadedImages.has(item.id) && !errorImages.has(item.id) && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-bengal-dark/80 animate-pulse z-20">
+                                    <div className="w-16 h-16 rounded-full border-2 border-orange-900/30 flex items-center justify-center">
+                                        <span className="font-serif text-xl italic text-gray-500">Img</span>
+                                    </div>
+                                </div>
+                            )}
                             
+                            {/* Placeholder si image manquante ou erreur */}
+                            {(!item.image || errorImages.has(item.id)) && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-600 bg-black/40 z-0">
+                                   <div className="w-16 h-16 rounded-full border-2 border-gray-600 flex items-center justify-center mb-2">
+                                      <span className="font-serif text-2xl italic text-gray-500">Img</span>
+                                   </div>
+                                </div>
+                            )}
+                            
+                            {/* Image */}
                             {item.image && (
                                 <img 
                                     src={item.image} 
-                                    alt={item.name} 
-                                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 relative z-10" 
-                                    onError={(e) => {
-                                        // If image fails, hide it so placeholder (which is behind it) becomes visible
-                                        e.currentTarget.style.display = 'none';
-                                    }}
+                                    alt={item.name}
+                                    loading="lazy"
+                                    className={`w-full h-full object-cover transform group-hover:scale-110 transition-all duration-500 relative z-10 ${
+                                        loadedImages.has(item.id) && !errorImages.has(item.id) ? 'opacity-100' : 'opacity-0'
+                                    }`}
+                                    onLoad={() => handleImageLoad(item.id)}
+                                    onError={() => handleImageError(item.id)}
+                                    style={{ display: errorImages.has(item.id) ? 'none' : 'block' }}
                                 />
                             )}
                         </div>

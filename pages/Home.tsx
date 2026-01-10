@@ -16,7 +16,8 @@ const Home: React.FC<HomeProps> = ({ setPage }) => {
         <div className="absolute inset-0 z-0">
           <img 
             src="https://images.unsplash.com/photo-1585937421612-70a008356f36?q=80&w=2070&auto=format&fit=crop" 
-            alt="" 
+            alt="Restaurant indien Le Tigre du Bengale" 
+            loading="eager"
             className="w-full h-full object-cover scale-105 animate-pulse-slow"
           />
           {/* Warm Gradient Overlay */}
