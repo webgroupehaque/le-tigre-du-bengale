@@ -66,6 +66,10 @@ export const handler = async (event: any) => {
       );
       console.log('Supabase client created');
 
+      // Générer un code de commande à 4 chiffres aléatoire (1000 à 9999)
+      const orderCode = Math.floor(1000 + Math.random() * 9000).toString();
+      console.log('Generated order code:', orderCode);
+
       const orderToInsert: any = {
         restaurant_id: metadata.restaurantId,
         customer_name: metadata.customerName,
@@ -77,6 +81,7 @@ export const handler = async (event: any) => {
         status: 'paid',
         stripe_payment_id: session.payment_intent as string,
         order_type: metadata.orderType || 'delivery',
+        order_code: orderCode, // Code à 4 chiffres
       };
 
       // Stocker aussi le session_id si la colonne existe (pour faciliter la recherche)
@@ -182,10 +187,16 @@ export const handler = async (event: any) => {
         const mailOptions = {
           from: `"Le Tigre du Bengale" <${process.env.GMAIL_USER}>`,
           to: process.env.RESTAURANT_EMAIL || 'le.tigre.du.bengale1@gmail.com',
-          subject: `🔔 Nouvelle commande #${session.id.slice(-8)} - ${metadata.customerName}`,
+          subject: `🔔 Nouvelle commande #${orderCode} - ${metadata.customerName}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h2 style="color: #ea580c;">🍛 Nouvelle commande reçue !</h2>
+              
+              <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                <p style="margin: 0; font-weight: bold; color: #92400e; font-size: 24px;">
+                  Code de commande : #${orderCode}
+                </p>
+              </div>
               
               <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
                 <h3 style="margin-top: 0;">👤 Informations client</h3>
@@ -211,7 +222,7 @@ export const handler = async (event: any) => {
 
               <div style="background: #dcfce7; padding: 15px; border-radius: 8px; margin: 20px 0;">
                 <p style="margin: 0; color: #166534;">✅ Paiement confirmé via Stripe</p>
-                <p style="margin: 5px 0 0 0; font-size: 12px; color: #166534;">ID: ${session.payment_intent}</p>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #166534;">ID paiement: ${session.payment_intent}</p>
               </div>
 
               <p style="color: #6b7280; font-size: 12px; margin-top: 30px;">
@@ -251,7 +262,7 @@ export const handler = async (event: any) => {
         const clientMailOptions = {
           from: `"Le Tigre du Bengale" <${process.env.GMAIL_USER}>`,
           to: session.customer_email!,
-          subject: `✅ Confirmation de votre commande - Le Tigre du Bengale`,
+          subject: `✅ Confirmation de votre commande #${orderCode} - Le Tigre du Bengale`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
               <div style="background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); padding: 30px; text-align: center;">
@@ -265,6 +276,16 @@ export const handler = async (event: any) => {
                 <div style="background: #dcfce7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a34a;">
                   <p style="margin: 0; color: #166534; font-weight: bold; font-size: 16px;">✅ Paiement confirmé</p>
                   <p style="margin: 5px 0 0 0; color: #166534; font-size: 14px;">Votre commande a bien été enregistrée et sera préparée dans les plus brefs délais.</p>
+                </div>
+
+                <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; border: 2px solid #f59e0b;">
+                  <p style="margin: 0; font-size: 14px; color: #92400e; font-weight: normal;">Votre code de commande</p>
+                  <p style="margin: 5px 0 0 0; font-weight: bold; color: #92400e; font-size: 32px; letter-spacing: 4px;">
+                    #${orderCode}
+                  </p>
+                  <p style="margin: 5px 0 0 0; font-size: 12px; color: #92400e;">
+                    ${metadata.orderType === 'delivery' ? 'Communiquez ce code au livreur' : 'Communiquez ce code au restaurant'}
+                  </p>
                 </div>
 
                 <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">

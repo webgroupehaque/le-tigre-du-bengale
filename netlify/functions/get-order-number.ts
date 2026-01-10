@@ -40,7 +40,7 @@ export const handler = async (event: any) => {
     // Chercher d'abord par stripe_session_id si la colonne existe
     let { data, error } = await supabase
       .from('orders')
-      .select('id')
+      .select('order_code')
       .eq('stripe_session_id', sessionId)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -53,7 +53,7 @@ export const handler = async (event: any) => {
       
       let query = supabase
         .from('orders')
-        .select('id')
+        .select('order_code')
         .gte('created_at', tenMinutesAgo)
         .order('created_at', { ascending: false })
         .limit(1);
@@ -78,19 +78,16 @@ export const handler = async (event: any) => {
       // Fallback : chercher simplement la commande la plus récente
       const { data: recentOrder } = await supabase
         .from('orders')
-        .select('id')
+        .select('order_code')
         .order('created_at', { ascending: false })
         .limit(1)
         .single();
 
-      if (recentOrder) {
-        // Formater le numéro : extraire les 4 derniers caractères de l'UUID
-        const uuidParts = String(recentOrder.id).split('-');
-        const orderNumber = uuidParts[uuidParts.length - 1].slice(0, 4).toUpperCase();
+      if (recentOrder && recentOrder.order_code) {
         return {
           statusCode: 200,
           headers,
-          body: JSON.stringify({ orderNumber }),
+          body: JSON.stringify({ orderNumber: recentOrder.order_code }),
         };
       }
 
@@ -101,14 +98,21 @@ export const handler = async (event: any) => {
       };
     }
 
-    // Formater le numéro : extraire les 4 derniers caractères de l'UUID
-    const uuidParts = String(data.id).split('-');
-    const orderNumber = uuidParts[uuidParts.length - 1].slice(0, 4).toUpperCase();
+    // Retourner le code de commande à 4 chiffres
+    if (data && data.order_code) {
+      const orderNumber = data.order_code;
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ orderNumber }),
+      };
+    }
 
+    // Si order_code n'existe pas (anciennes commandes), retourner erreur
     return {
-      statusCode: 200,
+      statusCode: 404,
       headers,
-      body: JSON.stringify({ orderNumber }),
+      body: JSON.stringify({ error: 'Order code not found' }),
     };
   } catch (error: any) {
     console.error('Error:', error);
