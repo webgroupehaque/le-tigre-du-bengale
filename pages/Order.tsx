@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { CartItem, MenuItem } from '../types';
 import { MENU_CATEGORIES, MENU_ITEMS } from '../constants';
 import { ShoppingBag, Edit3 } from 'lucide-react';
@@ -11,15 +11,6 @@ interface OrderProps {
 const Order: React.FC<OrderProps> = ({ addToCart }) => {
   const [activeCategory, setActiveCategory] = useState(MENU_CATEGORIES[0]);
   const [composingItem, setComposingItem] = useState<MenuItem | null>(null);
-
-  // Handle scroll spy to update active category
-  useEffect(() => {
-    const handleScroll = () => {
-      // Simple logic to highlight category if needed, or stick to click
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const scrollToCategory = (category: string) => {
     setActiveCategory(category);
@@ -92,8 +83,7 @@ const Order: React.FC<OrderProps> = ({ addToCart }) => {
                           <img
                             src={item.image}
                             alt={item.name}
-                            loading="lazy"
-                            className="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500"
+                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                           />
                         </div>
 
