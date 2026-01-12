@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
 import Navbar from './components/Navbar';
 import CartSidebar from './components/CartSidebar';
 import { CheckoutForm, CustomerInfo } from './components/CheckoutForm';
@@ -132,51 +133,53 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-bengal-dark text-slate-100 font-sans selection:bg-bengal-spice selection:text-white overflow-x-hidden">
-      <Navbar 
-        activePage={activePage} 
-        setActivePage={setActivePage} 
-        cartCount={cart.reduce((acc, item) => acc + item.quantity, 0)} 
-        openCart={() => setIsCartOpen(true)}
-      />
-      
-      <main className="fade-in-page">
-        {renderPage()}
-      </main>
+    <HelmetProvider>
+      <div className="min-h-screen bg-bengal-dark text-slate-100 font-sans selection:bg-bengal-spice selection:text-white overflow-x-hidden">
+        <Navbar 
+          activePage={activePage} 
+          setActivePage={setActivePage} 
+          cartCount={cart.reduce((acc, item) => acc + item.quantity, 0)} 
+          openCart={() => setIsCartOpen(true)}
+        />
+        
+        <main className="fade-in-page">
+          {renderPage()}
+        </main>
 
-      {/* Global Cart Sidebar */}
-      <CartSidebar 
-        isOpen={isCartOpen} 
-        onClose={() => setIsCartOpen(false)} 
-        cart={cart}
-        updateQuantity={updateQuantity}
-        removeFromCart={removeFromCart}
-        onCheckout={() => {
-          setIsCartOpen(false);
-          setIsCheckoutOpen(true);
-        }}
-        orderType={orderType}
-        setOrderType={setOrderType}
-      />
+        {/* Global Cart Sidebar */}
+        <CartSidebar 
+          isOpen={isCartOpen} 
+          onClose={() => setIsCartOpen(false)} 
+          cart={cart}
+          updateQuantity={updateQuantity}
+          removeFromCart={removeFromCart}
+          onCheckout={() => {
+            setIsCartOpen(false);
+            setIsCheckoutOpen(true);
+          }}
+          orderType={orderType}
+          setOrderType={setOrderType}
+        />
 
-      {/* Checkout Form */}
-      <CheckoutForm
-        isOpen={isCheckoutOpen}
-        onClose={() => setIsCheckoutOpen(false)}
-        cartItems={cart}
-        totalAmount={cart.reduce((acc, item) => acc + (getItemPrice(item) * item.quantity), 0) + (orderType === 'delivery' ? 2.50 : 0)}
-        onSubmit={handleCheckoutSubmit}
-        orderType={orderType}
-      />
+        {/* Checkout Form */}
+        <CheckoutForm
+          isOpen={isCheckoutOpen}
+          onClose={() => setIsCheckoutOpen(false)}
+          cartItems={cart}
+          totalAmount={cart.reduce((acc, item) => acc + (getItemPrice(item) * item.quantity), 0) + (orderType === 'delivery' ? 2.50 : 0)}
+          onSubmit={handleCheckoutSubmit}
+          orderType={orderType}
+        />
 
-      {/* Simple Footer */}
-      <footer className="bg-black py-8 border-t border-gray-900 mt-auto">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-xl font-serif text-bengal-gold mb-2">Le Tigre du Bengale</h2>
-          <p className="text-gray-600 text-sm">© 2024 - 19 Rue des Maréchaux, Nancy</p>
-        </div>
-      </footer>
-    </div>
+        {/* Simple Footer */}
+        <footer className="bg-black py-8 border-t border-gray-900 mt-auto">
+          <div className="container mx-auto px-6 text-center">
+            <h2 className="text-xl font-serif text-bengal-gold mb-2">Le Tigre du Bengale</h2>
+            <p className="text-gray-600 text-sm">© 2024 - 19 Rue des Maréchaux, Nancy</p>
+          </div>
+        </footer>
+      </div>
+    </HelmetProvider>
   );
 }
 

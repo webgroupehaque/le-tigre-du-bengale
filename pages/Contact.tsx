@@ -1,12 +1,20 @@
 import React from 'react';
 import { RESTAURANT_DATA } from '../constants';
 import { MapPin, Phone, Clock } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const Contact: React.FC = () => {
   const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(RESTAURANT_DATA.address + ", France")}&output=embed`;
 
   return (
-    <div className="min-h-screen pt-24 pb-12 bg-bengal-dark">
+    <>
+      <SEO 
+        title="Contact - Le Tigre du Bengale Nancy | Réservation Restaurant Indien"
+        description="Contactez le restaurant indien Le Tigre du Bengale à Nancy. Téléphone, adresse, horaires. Réservation en ligne disponible."
+        keywords="contact restaurant indien nancy, horaires restaurant indien nancy, adresse restaurant indien nancy"
+        url="https://tigre-du-bengale.netlify.app/contact"
+      />
+      <div className="min-h-screen pt-24 pb-12 bg-bengal-dark">
       <div className="container mx-auto px-4 md:px-8">
         <header className="text-center mb-16">
           <span className="text-bengal-gold uppercase tracking-widest text-sm font-bold">Localisation & Horaires</span>
@@ -88,6 +96,7 @@ const Contact: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

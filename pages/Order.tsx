@@ -3,6 +3,7 @@ import { CartItem, MenuItem } from '../types';
 import { MENU_CATEGORIES, MENU_ITEMS } from '../constants';
 import { ShoppingBag, Edit3 } from 'lucide-react';
 import MenuComposer from '../components/MenuComposer';
+import SEO from '../components/SEO';
 
 interface OrderProps {
   addToCart: (item: any) => void;
@@ -26,7 +27,14 @@ const Order: React.FC<OrderProps> = ({ addToCart }) => {
   };
 
   return (
-    <div className="min-h-screen pt-28 pb-20 bg-bengal-dark pattern-bg">
+    <>
+      <SEO 
+        title="Commander en Ligne - Restaurant Indien Le Tigre du Bengale Nancy"
+        description="Commandez vos plats indiens préférés en ligne : tandoori, curry, biryani, naan. Livraison rapide à Nancy. Menu complet disponible."
+        keywords="commander indien nancy, livraison indien nancy, menu indien nancy, plats indiens nancy"
+        url="https://tigre-du-bengale.netlify.app/order"
+      />
+      <div className="min-h-screen pt-28 pb-20 bg-bengal-dark pattern-bg">
       <div className="container mx-auto px-4 md:px-8">
         
         <div className="flex flex-col lg:flex-row gap-8">
@@ -82,7 +90,7 @@ const Order: React.FC<OrderProps> = ({ addToCart }) => {
                         <div className="h-48 bg-bengal-dark relative overflow-hidden group-hover:opacity-90 transition-opacity">
                           <img
                             src={item.image}
-                            alt={item.name}
+                            alt={`${item.name} - Plat indien authentique au restaurant Le Tigre du Bengale Nancy`}
                             className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                           />
                         </div>
@@ -144,6 +152,7 @@ const Order: React.FC<OrderProps> = ({ addToCart }) => {
         />
       )}
     </div>
+    </>
   );
 };
 

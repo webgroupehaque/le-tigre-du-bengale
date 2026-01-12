@@ -2,6 +2,7 @@ import React from 'react';
 import { ChevronRight, MapPin, Clock, Utensils } from 'lucide-react';
 import { PageView } from '../types';
 import { RESTAURANT_DATA } from '../constants';
+import SEO from '../components/SEO';
 
 interface HomeProps {
   setPage: (page: PageView) => void;
@@ -9,7 +10,9 @@ interface HomeProps {
 
 const Home: React.FC<HomeProps> = ({ setPage }) => {
   return (
-    <div className="w-full flex flex-col">
+    <>
+      <SEO />
+      <div className="w-full flex flex-col">
       {/* Hero Section */}
       <section className="relative h-screen min-h-[600px] w-full flex items-center justify-center overflow-hidden">
         {/* Background Image with Overlay - Appetizing Indian Food */}
@@ -30,13 +33,14 @@ const Home: React.FC<HomeProps> = ({ setPage }) => {
             Restaurant Indien Semi-Gastronomique
           </span>
           <h1 className="font-serif text-5xl md:text-7xl lg:text-9xl text-white mb-6 leading-tight animate-fade-in-up drop-shadow-xl">
-            Le Tigre <br/>
+            Restaurant Indien à Nancy
+            <br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-bengal-gold via-orange-400 to-bengal-spice">
-              du Bengale
+              Le Tigre du Bengale
             </span>
           </h1>
           <p className="text-bengal-cream text-lg md:text-2xl font-light mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in-up delay-100 drop-shadow-md">
-            Laissez-vous transporter par les épices envoûtantes de l'Inde.
+            Cuisine indienne authentique • Commande en ligne • Livraison rapide à Nancy
             <br/><span className="italic text-bengal-gold">Une cuisine riche, chaleureuse et authentique.</span>
           </p>
           
@@ -89,7 +93,23 @@ const Home: React.FC<HomeProps> = ({ setPage }) => {
           </div>
         </div>
       </section>
+
+      {/* SEO Section */}
+      <section className="py-16 px-4 bg-bengal-dark">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-center mb-8 text-white">
+            Votre Restaurant Indien de Confiance à Nancy
+          </h2>
+          <p className="text-lg md:text-xl text-gray-300 text-center leading-relaxed">
+            Découvrez les saveurs authentiques de l'Inde au cœur de Nancy. 
+            Le Tigre du Bengale vous propose une cuisine indienne traditionnelle : 
+            tandoori, curry, biryani, naan fraîchement préparés. 
+            Commandez en ligne et profitez d'une livraison rapide dans tout Nancy.
+          </p>
+        </div>
+      </section>
     </div>
+    </>
   );
 };
 
