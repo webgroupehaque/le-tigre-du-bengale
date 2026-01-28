@@ -15,7 +15,7 @@ const Home: React.FC<HomeProps> = ({ setPage }) => {
       <div className="w-full flex flex-col">
       {/* Hero Section */}
       <section className="relative h-screen min-h-[600px] w-full flex items-center justify-center overflow-hidden">
-        {/* Background Image with Overlay - Appetizing Indian Food */}
+        {/* Image de fond avec overlay chaleureux */}
         <div className="absolute inset-0 z-0">
           <img 
             src="https://images.unsplash.com/photo-1585937421612-70a008356f36?q=80&w=2070&auto=format&fit=crop" 
@@ -27,21 +27,23 @@ const Home: React.FC<HomeProps> = ({ setPage }) => {
           <div className="absolute inset-0 bg-black/20"></div>
         </div>
 
-        {/* Content */}
+        {/* Contenu principal */}
         <div className="relative z-10 text-center px-6 max-w-5xl mx-auto mt-16">
-          <span className="text-bengal-gold tracking-[0.3em] uppercase text-sm md:text-base font-bold mb-4 block animate-fade-in drop-shadow-md">
-            Restaurant Indien Semi-Gastronomique
+          <span className="text-bengal-gold tracking-[0.35em] uppercase text-xs md:text-sm font-bold mb-6 block animate-fade-in drop-shadow-md">
+            Restaurant indien semi-gastronomique
           </span>
-          <h1 className="font-serif text-5xl md:text-7xl lg:text-9xl text-white mb-6 leading-tight animate-fade-in-up drop-shadow-xl">
-            Restaurant Indien à Nancy
-            <br/>
+          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-white mb-4 leading-tight animate-fade-in-up drop-shadow-xl">
+            Le Tigre
+            <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-bengal-gold via-orange-400 to-bengal-spice">
-              Le Tigre du Bengale
+              du Bengale
             </span>
           </h1>
-          <p className="text-bengal-cream text-lg md:text-2xl font-light mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in-up delay-100 drop-shadow-md">
-            Cuisine indienne authentique • Commande en ligne • Livraison rapide à Nancy
-            <br/><span className="italic text-bengal-gold">Une cuisine riche, chaleureuse et authentique.</span>
+          <p className="text-bengal-cream text-lg md:text-2xl font-light mb-2 max-w-2xl mx-auto leading-relaxed animate-fade-in-up delay-100 drop-shadow-md">
+            Laissez-vous transporter par les épices envoûtantes de l'Inde.
+          </p>
+          <p className="text-bengal-gold text-base md:text-xl italic mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in-up delay-150 drop-shadow-md">
+            Une cuisine riche, chaleureuse et authentique.
           </p>
           
           <div className="flex flex-col md:flex-row items-center justify-center gap-6 animate-fade-in-up delay-200">
@@ -49,7 +51,7 @@ const Home: React.FC<HomeProps> = ({ setPage }) => {
               onClick={() => setPage('order')}
               className="px-10 py-4 bg-bengal-gold text-bengal-dark font-bold uppercase tracking-wider hover:bg-white hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(245,158,11,0.4)]"
             >
-              Voir la Carte
+              Voir la carte
             </button>
             <button 
               onClick={() => setPage('contact')}
@@ -94,20 +96,6 @@ const Home: React.FC<HomeProps> = ({ setPage }) => {
         </div>
       </section>
 
-      {/* SEO Section */}
-      <section className="py-16 px-4 bg-bengal-dark">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-center mb-8 text-white">
-            Votre Restaurant Indien de Confiance à Nancy
-          </h2>
-          <p className="text-lg md:text-xl text-gray-300 text-center leading-relaxed">
-            Découvrez les saveurs authentiques de l'Inde au cœur de Nancy. 
-            Le Tigre du Bengale vous propose une cuisine indienne traditionnelle : 
-            tandoori, curry, biryani, naan fraîchement préparés. 
-            Commandez en ligne et profitez d'une livraison rapide dans tout Nancy.
-          </p>
-        </div>
-      </section>
     </div>
     </>
   );

@@ -175,7 +175,7 @@ function App() {
         <footer className="bg-black py-8 border-t border-gray-900 mt-auto">
           <div className="container mx-auto px-6 text-center">
             <h2 className="text-xl font-serif text-bengal-gold mb-2">Le Tigre du Bengale</h2>
-            <p className="text-gray-600 text-sm">© 2024 - 19 Rue des Maréchaux, Nancy</p>
+            <p className="text-gray-600 text-sm">© Le Tigre du Bengale - 19 Rue des Maréchaux, Nancy</p>
           </div>
         </footer>
       </div>
