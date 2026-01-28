@@ -55,6 +55,19 @@ export const handler = async (event: any) => {
     try {
       const metadata = session.metadata!;
       console.log('Metadata:', metadata);
+
+      // ✅ FILTRE : Ignore les commandes qui ne sont pas pour ce restaurant
+      if (metadata.restaurantId !== 'tigre-bengale') {
+        console.log(`⚠️ Webhook ignoré : commande pour ${metadata.restaurantId}, pas pour tigre-bengale`);
+        return {
+          statusCode: 200,
+          body: JSON.stringify({ 
+            received: true, 
+            ignored: true,
+            reason: 'Not for this restaurant'
+          })
+        };
+      }
       
       const orderData = JSON.parse(metadata.orderData);
       console.log('Order data parsed:', orderData.length, 'items');
