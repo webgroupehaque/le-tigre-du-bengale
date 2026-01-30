@@ -29,9 +29,6 @@ const Home: React.FC<HomeProps> = ({ setPage }) => {
 
         {/* Contenu principal */}
         <div className="relative z-10 text-center px-6 max-w-5xl mx-auto mt-16">
-          <span className="text-bengal-gold tracking-[0.35em] uppercase text-xs md:text-sm font-bold mb-6 block animate-fade-in drop-shadow-md">
-            Restaurant indien semi-gastronomique
-          </span>
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-white mb-4 leading-tight animate-fade-in-up drop-shadow-xl">
             Le Tigre
             <br />
