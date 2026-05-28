@@ -88,11 +88,10 @@ export const handler = async (event: any) => {
         customer_name: metadata.customerName,
         customer_email: session.customer_email,
         customer_phone: metadata.customerPhone,
-        customer_address: metadata.customerAddress,
+        delivery_address: metadata.customerAddress,
         items: orderData,
         total_amount: (session.amount_total! / 100).toFixed(2),
-        status: 'paid',
-        stripe_payment_id: session.payment_intent as string,
+        payment_status: 'paid',
         order_type: metadata.orderType || 'delivery',
         order_code: orderCode, // Code à 4 chiffres
       };
