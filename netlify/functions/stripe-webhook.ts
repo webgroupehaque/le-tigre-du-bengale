@@ -379,6 +379,15 @@ export const handler = async (event: any) => {
         // Ne pas faire échouer le webhook
       }
 
+      // Incrément used_count si promo code utilisé
+      if (metadata.promoCode) {
+        try {
+          const { data: pc } = await supabase.from("promo_codes").select("id,used_count").ilike("code", metadata.promoCode).maybeSingle();
+          if (pc) await supabase.from("promo_codes").update({ used_count: pc.used_count + 1, updated_at: new Date().toISOString() }).eq("id", pc.id);
+        } catch (e) { console.error("Promo increment error:", e); }
+      }
+
+
       return { statusCode: 200, body: 'Order saved' };
       
     } catch (err: any) {
