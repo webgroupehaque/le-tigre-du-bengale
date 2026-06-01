@@ -8,6 +8,19 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 const SUPABASE_URL = process.env.SUPABASE_URL!;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY!;
 
+async function fetchDbPrices(restaurantId: string): Promise<Record<string, number>> {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/menu_items?restaurant_id=eq.${restaurantId}&select=item_id,base_price&is_available=eq.true`, {
+      headers: { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}` },
+    });
+    if (!res.ok) return {};
+    const items: Array<{ item_id: string; base_price: number }> = await res.json();
+    const map: Record<string, number> = {};
+    for (const it of items) map[it.item_id] = Number(it.base_price);
+    return map;
+  } catch { return {}; }
+}
+
 async function validatePromoCode(
   code: string,
   restaurantId: string,
@@ -72,13 +85,13 @@ export const handler = async (event: any) => {
     const { cartItems, customerInfo, restaurantId, orderType, promoCode } = JSON.parse(event.body);
 
     for (const item of cartItems) {
-      if (!MENU_PRICES[item.id]) {
+      if (!MERGED_PRICES[item.id]) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: `Produit invalide: ${item.id}` }) };
       }
     }
 
     const calculateItemPrice = (item: any): number => {
-      const basePrice = MENU_PRICES[item.id];
+      const basePrice = MERGED_PRICES[item.id];
       if (item.selectedOptions) {
         for (const optionValue of Object.values(item.selectedOptions)) {
           const val = optionValue as string;
