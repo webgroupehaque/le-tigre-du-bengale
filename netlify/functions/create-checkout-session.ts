@@ -84,6 +84,9 @@ export const handler = async (event: any) => {
   try {
     const { cartItems, customerInfo, restaurantId, orderType, promoCode } = JSON.parse(event.body);
 
+    const dbPrices = await fetchDbPrices(restaurantId);
+    const MERGED_PRICES: Record<string, number> = { ...MENU_PRICES, ...dbPrices };
+
     for (const item of cartItems) {
       if (!MERGED_PRICES[item.id]) {
         return { statusCode: 400, headers, body: JSON.stringify({ error: `Produit invalide: ${item.id}` }) };
