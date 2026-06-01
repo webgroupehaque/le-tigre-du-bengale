@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { CartItem, MenuItem } from '../types';
-import { MENU_CATEGORIES, MENU_ITEMS } from '../constants';
 import { ShoppingBag, Edit3 } from 'lucide-react';
 import MenuComposer from '../components/MenuComposer';
 import SEO from '../components/SEO';
+import { useMenu } from '../hooks/useMenu';
 
 interface OrderProps {
   addToCart: (item: any) => void;
 }
 
 const Order: React.FC<OrderProps> = ({ addToCart }) => {
+  const { items: MENU_ITEMS, categories: MENU_CATEGORIES } = useMenu();
   const [activeCategory, setActiveCategory] = useState(MENU_CATEGORIES[0]);
   const [composingItem, setComposingItem] = useState<MenuItem | null>(null);
 
