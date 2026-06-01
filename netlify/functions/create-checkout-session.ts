@@ -5,161 +5,132 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-12-18.acacia',
 });
 
+const SUPABASE_URL = process.env.SUPABASE_URL!;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY!;
+
+async function validatePromoCode(
+  code: string,
+  restaurantId: string,
+  subtotalEuros: number,
+): Promise<{ valid: true; discountCents: number; codeNormalized: string } | { valid: false; error: string }> {
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/promo_codes?code=ilike.${encodeURIComponent(code)}&is_active=eq.true&select=*`;
+    const res = await fetch(url, {
+      headers: { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}` },
+    });
+    if (!res.ok) return { valid: false, error: 'Erreur validation code promo' };
+    const list = await res.json();
+    if (!Array.isArray(list) || list.length === 0) return { valid: false, error: 'Code promo invalide' };
+
+    const promo = list[0];
+    const now = new Date();
+
+    if (promo.restaurant_id && promo.restaurant_id !== restaurantId) {
+      return { valid: false, error: 'Code promo non valide pour ce restaurant' };
+    }
+    if (promo.valid_from && new Date(promo.valid_from) > now) {
+      return { valid: false, error: 'Code promo pas encore valide' };
+    }
+    if (promo.valid_until && new Date(promo.valid_until) < now) {
+      return { valid: false, error: 'Code promo expiré' };
+    }
+    if (promo.max_uses != null && promo.used_count >= promo.max_uses) {
+      return { valid: false, error: 'Code promo épuisé' };
+    }
+    if (promo.min_order_cents > 0 && Math.round(subtotalEuros * 100) < promo.min_order_cents) {
+      const minEuros = (promo.min_order_cents / 100).toFixed(2);
+      return { valid: false, error: `Minimum ${minEuros}€ requis pour ce code` };
+    }
+
+    let discountCents = 0;
+    if (promo.discount_type === 'percentage') {
+      discountCents = Math.round(subtotalEuros * 100 * (Number(promo.discount_value) / 100));
+    } else {
+      discountCents = Math.round(Number(promo.discount_value) * 100);
+    }
+    // Cap at subtotal
+    discountCents = Math.min(discountCents, Math.round(subtotalEuros * 100));
+
+    return { valid: true, discountCents, codeNormalized: promo.code };
+  } catch (err: any) {
+    console.error('Promo validation error:', err);
+    return { valid: false, error: 'Erreur serveur' };
+  }
+}
+
 export const handler = async (event: any) => {
-  // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
   };
 
-  // Handle preflight
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
-  }
-
-  if (event.httpMethod !== 'POST') {
-    return { 
-      statusCode: 405, 
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' }) 
-    };
-  }
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
+  if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
 
   try {
-    const { cartItems, customerInfo, restaurantId, orderType } = JSON.parse(event.body);
+    const { cartItems, customerInfo, restaurantId, orderType, promoCode } = JSON.parse(event.body);
 
-    // Debug logs
-    console.log('=== DEBUG CHECKOUT ===');
-    console.log('Cart items received:', JSON.stringify(cartItems, null, 2));
-    console.log('Available prices:', Object.keys(MENU_PRICES));
-    console.log('=====================');
-
-    // Valider que tous les produits existent dans MENU_PRICES
     for (const item of cartItems) {
       if (!MENU_PRICES[item.id]) {
-        console.error(`INVALID PRODUCT: ${item.id}`);
-        console.error(`Available IDs:`, Object.keys(MENU_PRICES).slice(0, 10));
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ 
-            error: `Produit invalide: ${item.id}. Available IDs: ${Object.keys(MENU_PRICES).slice(0, 5).join(', ')}` 
-          }),
-        };
+        return { statusCode: 400, headers, body: JSON.stringify({ error: `Produit invalide: ${item.id}` }) };
       }
     }
 
-    // Helper function to calculate price with meat supplements
     const calculateItemPrice = (item: any): number => {
       const basePrice = MENU_PRICES[item.id];
-      if (!basePrice) {
-        throw new Error(`Invalid product ID: ${item.id}`);
-      }
-
-      // Check if item has meat option with supplement (Crevettes or Agneau)
       if (item.selectedOptions) {
         for (const optionValue of Object.values(item.selectedOptions)) {
           const val = optionValue as string;
-          // Check if option contains "Crevettes" or "Agneau" (with or without price in parentheses)
-          if (val.includes('Crevettes') || val.includes('Agneau')) {
-            // Add 2.00€ supplement for Crevettes or Agneau
-            return basePrice + 2.00;
-          }
+          if (val.includes('Crevettes') || val.includes('Agneau')) return basePrice + 2.00;
         }
       }
-
       return basePrice;
     };
 
-    // Recalculer les prix côté serveur (IGNORER les prix du frontend)
-    const lineItems = cartItems.map((item: any) => {
-      console.log(`Checking item: ${item.id}, base price: ${MENU_PRICES[item.id]}`);
-      const securePrice = calculateItemPrice(item);
-      console.log(`Final price for ${item.id}: ${securePrice}€`);
-      
-      return {
-        price_data: {
-          currency: 'eur',
-          product_data: {
-            name: item.name,
-            description: item.selectedOptions 
-              ? Object.entries(item.selectedOptions)
-                  .map(([key, value]) => {
-                    // Remove price from display in description
-                    const val = value as string;
-                    return `${key}: ${val.replace(/\(([\d.]+)€\)/, '').trim()}`;
-                  })
-                  .join(', ')
-              : undefined,
-          },
-          unit_amount: Math.round(securePrice * 100), // Prix sécurisé en centimes
+    const lineItems: any[] = cartItems.map((item: any) => ({
+      price_data: {
+        currency: 'eur',
+        product_data: {
+          name: item.name,
+          description: item.selectedOptions
+            ? Object.entries(item.selectedOptions).map(([k, v]) => `${k}: ${(v as string).replace(/\(([\d.]+)€\)/, '').trim()}`).join(', ')
+            : undefined,
         },
-        quantity: item.quantity,
-      };
-    });
+        unit_amount: Math.round(calculateItemPrice(item) * 100),
+      },
+      quantity: item.quantity,
+    }));
 
-    // Calculer le total côté serveur (avec suppléments si applicable)
-    const serverCartTotal = cartItems.reduce((acc: number, item: any) => {
-      const securePrice = calculateItemPrice(item);
-      return acc + (securePrice * item.quantity);
-    }, 0);
+    const serverCartTotal = cartItems.reduce((acc: number, item: any) => acc + (calculateItemPrice(item) * item.quantity), 0);
+    const serverDeliveryFee = orderType === 'delivery' ? DELIVERY_FEE : 0;
 
-    // Ajouter les frais de livraison uniquement si delivery
-    const serverDeliveryFee = (orderType === 'delivery' ? DELIVERY_FEE : 0);
-    const serverTotalAmount = serverCartTotal + serverDeliveryFee;
-
-    // Ajouter les frais de livraison aux line items uniquement si delivery
     if (serverDeliveryFee > 0) {
       lineItems.push({
-        price_data: {
-          currency: 'eur',
-          product_data: {
-            name: 'Frais de livraison',
-          },
-          unit_amount: Math.round(DELIVERY_FEE * 100), // 2.50€ en centimes
-        },
+        price_data: { currency: 'eur', product_data: { name: 'Frais de livraison' }, unit_amount: Math.round(DELIVERY_FEE * 100) },
         quantity: 1,
       });
     }
 
-    // Nettoyer les items pour les metadata (enlever les données inutiles pour respecter la limite de 500 caractères)
-    // On garde uniquement : id, name, quantity, selectedOptions, price
-    let cleanedItems = cartItems.map((item: any) => ({
-      id: item.id,
-      name: item.name,
-      quantity: item.quantity,
-      selectedOptions: item.selectedOptions || null,
-      price: item.price || null, // On garde le prix pour le calcul dans le webhook
-    }));
-
-    let orderDataString = JSON.stringify(cleanedItems);
-    console.log('OrderData length:', orderDataString.length);
-    
-    // Si c'est encore trop long (ce qui ne devrait normalement pas arriver), retirer le prix aussi
-    if (orderDataString.length > 500) {
-      console.warn('WARNING: OrderData still too long!', orderDataString.length, 'characters');
-      console.warn('Reducing to minimal data (removing price)...');
-      
-      // Version minimale sans prix (le prix sera recalculé dans le webhook depuis MENU_PRICES)
-      cleanedItems = cartItems.map((item: any) => ({
-        id: item.id,
-        name: item.name,
-        quantity: item.quantity,
-        selectedOptions: item.selectedOptions || null,
-      }));
-      
-      orderDataString = JSON.stringify(cleanedItems);
-      console.log('Minimal OrderData length:', orderDataString.length, 'characters');
-      
-      if (orderDataString.length > 500) {
-        console.error('ERROR: OrderData STILL too long even with minimal data!', orderDataString.length);
-        // En dernier recours, tronquer ou utiliser une autre méthode (mais ça ne devrait jamais arriver)
+    // Validation du code promo (optionnel)
+    let validatedPromoCode: string | null = null;
+    let discountCents = 0;
+    if (promoCode && typeof promoCode === 'string' && promoCode.trim()) {
+      const result = await validatePromoCode(promoCode.trim(), restaurantId, serverCartTotal);
+      if (!result.valid) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: result.error }) };
       }
+      validatedPromoCode = result.codeNormalized;
+      discountCents = result.discountCents;
     }
 
-    // Create Checkout Session
-    const session = await stripe.checkout.sessions.create({
+    const cleanedItems = cartItems.map((item: any) => ({
+      id: item.id, name: item.name, quantity: item.quantity,
+      selectedOptions: item.selectedOptions || null, price: item.price || null,
+    }));
+
+    // Configure Stripe session
+    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
@@ -171,22 +142,28 @@ export const handler = async (event: any) => {
         customerName: customerInfo.name,
         customerPhone: customerInfo.phone,
         customerAddress: customerInfo.address || 'À emporter',
-        orderData: JSON.stringify(cleanedItems), // Utiliser cleanedItems au lieu de cartItems
+        orderData: JSON.stringify(cleanedItems),
         orderType: orderType || 'delivery',
+        promoCode: validatedPromoCode ?? '',
       },
-    });
-
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ sessionId: session.id, url: session.url }),
     };
+
+    // Apply discount via one-shot Stripe coupon
+    if (discountCents > 0) {
+      const coupon = await stripe.coupons.create({
+        amount_off: discountCents,
+        currency: 'eur',
+        duration: 'once',
+        name: `Code ${validatedPromoCode}`,
+      });
+      sessionConfig.discounts = [{ coupon: coupon.id }];
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
+
+    return { statusCode: 200, headers, body: JSON.stringify({ sessionId: session.id, url: session.url }) };
   } catch (error: any) {
     console.error('Error creating checkout session:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: error.message }),
-    };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
   }
 };
