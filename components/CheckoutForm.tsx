@@ -7,7 +7,7 @@ interface CheckoutFormProps {
   onClose: () => void;
   cartItems: CartItem[];
   totalAmount: number;
-  onSubmit: (customerInfo: CustomerInfo, orderType: OrderType) => void;
+  onSubmit: (customerInfo: CustomerInfo, orderType: OrderType, promoCode?: string) => Promise<string | void>;
   orderType: OrderType;
 }
 
@@ -34,6 +34,9 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   });
 
   const [errors, setErrors] = useState<Partial<CustomerInfo>>({});
+  const [promoCode, setPromoCode] = useState('');
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Helper to extract price from option string like "Crevettes (19.90€)"
   // If found, it overrides the base price. If not, returns item.price
@@ -80,9 +83,17 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
+  const submitOrder = async () => {
+    setSubmitError('');
+    setIsSubmitting(true);
+    const err = await onSubmit(formData, orderType, promoCode.trim() || undefined);
+    setIsSubmitting(false);
+    if (err) setSubmitError(err);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Si à emporter, l'adresse n'est pas obligatoire
     if (orderType === 'pickup') {
       const newErrors: Partial<CustomerInfo> = {};
@@ -99,11 +110,11 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
       }
       setErrors(newErrors);
       if (Object.keys(newErrors).length === 0) {
-        onSubmit(formData, orderType);
+        submitOrder();
       }
     } else {
       if (validateForm()) {
-        onSubmit(formData, orderType);
+        submitOrder();
       }
     }
   };
@@ -255,6 +266,25 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 </div>
               )}
 
+              <div>
+                <label htmlFor="promoCode" className="block text-sm font-medium text-gray-400 mb-1">
+                  Code promo (optionnel)
+                </label>
+                <input
+                  type="text"
+                  id="promoCode"
+                  name="promoCode"
+                  value={promoCode}
+                  onChange={(e) => { setPromoCode(e.target.value); setSubmitError(''); }}
+                  className="w-full px-4 py-2 bg-bengal-dark/50 border border-orange-900/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-bengal-gold focus:ring-2 focus:ring-bengal-gold/50 transition-colors uppercase"
+                  placeholder="EX : BIENVENUE10"
+                />
+              </div>
+
+              {submitError && (
+                <p className="text-red-500 text-sm bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2">{submitError}</p>
+              )}
+
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
@@ -265,9 +295,10 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-bengal-gold to-orange-600 text-white font-bold uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_0_20px_rgba(234,88,12,0.3)] rounded-lg"
+                  disabled={isSubmitting}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-bengal-gold to-orange-600 text-white font-bold uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_0_20px_rgba(234,88,12,0.3)] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Procéder au paiement
+                  {isSubmitting ? 'Traitement…' : 'Procéder au paiement'}
                 </button>
               </div>
             </form>

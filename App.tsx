@@ -83,7 +83,7 @@ function App() {
      setCart((prevCart) => prevCart.filter(item => getCartItemKey(item) !== itemKey));
   };
 
-  const handleCheckoutSubmit = async (customerInfo: CustomerInfo, submittedOrderType: OrderType) => {
+  const handleCheckoutSubmit = async (customerInfo: CustomerInfo, submittedOrderType: OrderType, promoCode?: string): Promise<string | void> => {
     try {
       // Calculer le total avec getItemPrice pour prendre en compte les suppléments
       const cartTotal = cart.reduce((acc, item) => acc + (getItemPrice(item) * item.quantity), 0);
@@ -100,6 +100,7 @@ function App() {
           totalAmount,
           restaurantId: 'tigre-bengale',
           orderType: submittedOrderType,
+          promoCode,
         }),
       });
 
@@ -108,12 +109,12 @@ function App() {
       if (data.url) {
         // Rediriger vers Stripe Checkout
         window.location.href = data.url;
-      } else {
-        alert('Erreur lors de la création de la session de paiement');
+        return;
       }
+      return data.error || 'Erreur lors de la création de la session de paiement';
     } catch (error) {
       console.error('Erreur:', error);
-      alert('Une erreur est survenue');
+      return 'Une erreur est survenue';
     }
   };
 
