@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://tigre-du-bengale.netlify.app/sitemap.xml
+Sitemap: https://letigredubengale.fr/sitemap.xml

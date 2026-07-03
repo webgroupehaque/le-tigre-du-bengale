@@ -7,14 +7,14 @@
     <meta name="description" content="Le Tigre du Bengale, restaurant indien au 19 rue des Maréchaux à Nancy. Tandoori, curry, biryani, naan — sur place ou à emporter, commande en ligne. Ouvert 7j/7." />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#1C1917" />
-    <link rel="canonical" href="https://tigre-du-bengale.netlify.app/" />
+    <link rel="canonical" href="https://letigredubengale.fr/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Le Tigre du Bengale" />
     <meta property="og:locale" content="fr_FR" />
-    <meta property="og:url" content="https://tigre-du-bengale.netlify.app/" />
+    <meta property="og:url" content="https://letigredubengale.fr/" />
     <meta property="og:title" content="Le Tigre du Bengale — Restaurant Indien à Nancy" />
     <meta property="og:description" content="Cuisine indienne authentique à Nancy : tandoori, curry, biryani, naan. Sur place ou à emporter, commande en ligne. Ouvert 7j/7." />
     <meta property="og:image" content="https://images.unsplash.com/photo-1585937421612-70a008356f36?q=80&w=1200&h=630&auto=format&fit=crop" />
@@ -32,10 +32,10 @@
     {
       "@context": "https://schema.org",
       "@type": "Restaurant",
-      "@id": "https://tigre-du-bengale.netlify.app/#restaurant",
+      "@id": "https://letigredubengale.fr/#restaurant",
       "name": "Le Tigre du Bengale",
       "description": "Restaurant indien authentique à Nancy : tandoori, curry, biryani, naan. Sur place ou à emporter, commande en ligne.",
-      "url": "https://tigre-du-bengale.netlify.app/",
+      "url": "https://letigredubengale.fr/",
       "image": "https://images.unsplash.com/photo-1585937421612-70a008356f36?q=80&w=1200&h=630&auto=format&fit=crop",
       "telephone": "+33383228831",
       "servesCuisine": ["Indienne", "Bangladaise"],
@@ -140,9 +140,53 @@
 }
 </script>
 <link rel="stylesheet" href="/index.css">
+
+    <!-- Google Analytics 4 — chargé uniquement après consentement (RGPD/CNIL) -->
+    <script>
+      (function () {
+        var GA_ID = 'G-GDMQ6KK61L';
+        window.__loadGA = function () {
+          if (window.__gaLoaded) return;
+          window.__gaLoaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+          document.head.appendChild(s);
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function () { dataLayer.push(arguments); };
+          gtag('js', new Date());
+          gtag('config', GA_ID, { anonymize_ip: true });
+        };
+        try {
+          if (localStorage.getItem('cookie-consent') === 'granted') window.__loadGA();
+        } catch (e) {}
+      })();
+    </script>
 </head>
   <body>
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
+    <!-- Bandeau cookies — consentement Google Analytics -->
+    <div id="cookie-banner" style="display:none;position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;max-width:680px;margin:0 auto;background:#292524;color:#FEF3C7;border:1px solid #F59E0B;border-radius:14px;padding:14px 18px;font-family:Lato,system-ui,sans-serif;font-size:14px;box-shadow:0 8px 30px rgba(0,0,0,.45);flex-wrap:wrap;align-items:center;gap:10px">
+      <span style="flex:1 1 240px;line-height:1.45">Nous utilisons Google Analytics pour mesurer l’audience du site. Acceptez-vous ces cookies ?</span>
+      <span style="display:flex;gap:8px;margin-left:auto">
+        <button id="cookie-refuse" type="button" style="background:transparent;color:#FEF3C7;border:1px solid #FEF3C7;border-radius:999px;padding:8px 16px;cursor:pointer;font-size:13px">Refuser</button>
+        <button id="cookie-accept" type="button" style="background:#F59E0B;color:#1C1917;border:none;border-radius:999px;padding:8px 18px;font-weight:700;cursor:pointer;font-size:13px">Accepter</button>
+      </span>
+    </div>
+    <script>
+      (function () {
+        try { if (localStorage.getItem('cookie-consent')) return; } catch (e) { return; }
+        var b = document.getElementById('cookie-banner');
+        b.style.display = 'flex';
+        document.getElementById('cookie-accept').onclick = function () {
+          localStorage.setItem('cookie-consent', 'granted'); b.remove(); window.__loadGA();
+        };
+        document.getElementById('cookie-refuse').onclick = function () {
+          localStorage.setItem('cookie-consent', 'denied'); b.remove();
+        };
+      })();
+    </script>
+
 </body>
 </html>
