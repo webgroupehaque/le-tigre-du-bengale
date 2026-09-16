@@ -1,23 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { PageView } from '../types';
+import React, { useState, useEffect, useRef } from 'react';
 import { ShoppingBag, Menu, X, Phone } from 'lucide-react';
-import { RESTAURANT_DATA } from '../constants';
+import { useCart } from '@kit';
+import { PageView } from '../types';
 
 interface NavbarProps {
   activePage: PageView;
   setActivePage: (page: PageView) => void;
-  cartCount: number;
-  openCart: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ activePage, setActivePage, cartCount, openCart }) => {
+const Navbar: React.FC<NavbarProps> = ({ activePage, setActivePage }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { count: cartCount, open: openCart, registerCartIcon, ordering, settings } = useCart();
+  const cartRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
+    registerCartIcon(cartRef.current);
+    return () => registerCartIcon(null);
+  }, [registerCartIcon, ordering.enabled]);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -34,54 +37,47 @@ const Navbar: React.FC<NavbarProps> = ({ activePage, setActivePage, cartCount, o
   return (
     <nav className={navClass}>
       <div className="container mx-auto px-6 flex justify-between items-center">
-        {/* Brand */}
-        <div 
-          onClick={() => setActivePage('home')} 
-          className="cursor-pointer flex flex-col items-start group"
-        >
-          <h1 className="text-2xl md:text-3xl font-serif font-bold text-white group-hover:text-bengal-gold transition-colors">
-            Le Tigre
-          </h1>
+        <div onClick={() => setActivePage('home')} className="cursor-pointer flex flex-col items-start group">
+          <h1 className="text-2xl md:text-3xl font-serif font-bold text-white group-hover:text-bengal-gold transition-colors">Le Tigre</h1>
           <span className="text-xs text-bengal-gold tracking-[0.2em] uppercase">du Bengale</span>
         </div>
 
-        {/* Desktop Links */}
         <div className="hidden md:flex items-center space-x-12">
           <span onClick={() => setActivePage('home')} className={linkClass('home')}>Accueil</span>
           <span onClick={() => setActivePage('order')} className={linkClass('order')}>Notre Carte</span>
           <span onClick={() => setActivePage('contact')} className={linkClass('contact')}>Infos & Contact</span>
         </div>
 
-        {/* Actions */}
         <div className="hidden md:flex items-center space-x-6">
-          <a href={`tel:${RESTAURANT_DATA.phone}`} className="flex items-center text-bengal-cream hover:text-bengal-gold transition-colors">
-            <Phone size={18} className="mr-2" />
-            <span className="text-sm font-bold">{RESTAURANT_DATA.phone}</span>
-          </a>
-          {/* Cart Icon - Toggles Cart Sidebar */}
-          <button 
-            onClick={openCart}
-            className="relative p-2 text-bengal-cream hover:text-bengal-gold transition-colors group"
-          >
-            <ShoppingBag size={24} className="group-hover:fill-current" />
-            {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-bengal-spice text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full animate-bounce">
-                {cartCount}
-              </span>
-            )}
-          </button>
+          {settings.phone && (
+            <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="flex items-center text-bengal-cream hover:text-bengal-gold transition-colors">
+              <Phone size={18} className="mr-2" />
+              <span className="text-sm font-bold">{settings.phone}</span>
+            </a>
+          )}
+          {ordering.enabled && (
+            <button ref={cartRef} onClick={openCart} className="relative p-2 text-bengal-cream hover:text-bengal-gold transition-colors group" aria-label="Panier">
+              <ShoppingBag size={24} className="group-hover:fill-current" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-bengal-spice text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full">{cartCount}</span>
+              )}
+            </button>
+          )}
         </div>
 
-        {/* Mobile Toggle */}
-        <button 
-          className="md:hidden text-white"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
+        <div className="md:hidden flex items-center gap-3">
+          {ordering.enabled && (
+            <button onClick={openCart} className="relative p-2 text-bengal-cream" aria-label="Panier">
+              <ShoppingBag size={24} />
+              {cartCount > 0 && <span className="absolute -top-1 -right-1 bg-bengal-spice text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full">{cartCount}</span>}
+            </button>
+          )}
+          <button className="text-white" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="Menu">
+            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="absolute top-full left-0 w-full bg-bengal-dark shadow-xl border-t border-orange-900/50 md:hidden flex flex-col p-6 space-y-6 animate-fade-in-down">
           <span onClick={() => { setActivePage('home'); setIsMobileMenuOpen(false); }} className={linkClass('home')}>Accueil</span>
