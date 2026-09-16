@@ -25,8 +25,12 @@ const Home: React.FC<HomeProps> = ({ setPage }) => {
 
           <div className="relative z-10 text-center px-6 max-w-5xl mx-auto mt-16">
             <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-white mb-4 leading-tight animate-fade-in-up drop-shadow-xl">
-              {c('hero.line1')}
-              <br />
+              {c('hero.line1') && (
+                <>
+                  {c('hero.line1')}
+                  <br />
+                </>
+              )}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-bengal-gold via-orange-400 to-bengal-spice">{c('hero.line2')}</span>
             </h1>
             <p className="text-bengal-cream text-lg md:text-2xl font-light mb-2 max-w-2xl mx-auto leading-relaxed animate-fade-in-up delay-100 drop-shadow-md">{c('hero.subtitle')}</p>
