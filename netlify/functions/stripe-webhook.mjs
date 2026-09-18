@@ -52,6 +52,30 @@ async function sendEmails(r, order) {
   ]);
 }
 
+
+// Signale la nouvelle commande payée à l'app Rekvo (écran cuisine + notifications),
+// best-effort : un échec ne bloque jamais le webhook Stripe.
+// Env : REKVO_NOTIFY_SECRET (obligatoire pour signaler), REKVO_NOTIFY_URL (optionnel).
+async function notifyRekvo(order, restaurantId) {
+  const { REKVO_NOTIFY_SECRET, REKVO_NOTIFY_URL, SUPABASE_URL } = process.env;
+  if (!REKVO_NOTIFY_SECRET || !SUPABASE_URL) return;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 6000);
+  try {
+    await fetch(REKVO_NOTIFY_URL || 'https://espace.rekvo.agency/api/orders/notify', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${REKVO_NOTIFY_SECRET}` },
+      body: JSON.stringify({ supabase_url: SUPABASE_URL, restaurant_id: restaurantId, order_code: order.order_code, total_amount: Number(order.total_amount) || 0, order_type: order.order_type }),
+      signal: ctrl.signal,
+    });
+  } catch (e) {
+    console.error(`Notification Rekvo commande ${order.order_code} échouée :`, e?.message || e);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+
 export const handler = async (event) => {
   const { STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET } = process.env;
   if (!STRIPE_SECRET_KEY || !STRIPE_WEBHOOK_SECRET) return { statusCode: 500, body: 'Configuration Stripe incomplète.' };
@@ -82,6 +106,7 @@ export const handler = async (event) => {
           const { error: promoErr } = await db.rpc('increment_promo_used', { promo_code: promoCode });
           if (promoErr) console.error('Compteur promo non incrémenté :', promoErr.message);
         }
+        await notifyRekvo(order, RESTAURANT_ID);
         try {
           const r = await loadRestaurant(db);
           await sendEmails(r, order);
