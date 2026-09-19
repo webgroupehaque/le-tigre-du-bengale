@@ -16,3 +16,4 @@ export { optionsTotal, missingRequired, selectionDetail, pick, unitPrice, type S
 export { CartProvider, useCart } from './cart';
 export { startCheckout, validatePromo, readPaymentResult, toPayloadLines, type CheckoutPayload } from './checkout';
 export { useMenu, useSettings, useRestaurant, useContent, useGallery, useBodyScrollLock, useEscape } from './hooks';
+export { useVisitTracking, VisitTracker, trackPageView, visitSource } from './analytics';
