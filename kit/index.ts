@@ -11,7 +11,7 @@ export { supabase, RESTAURANT_ID, hasSupabase, euro } from './supabase';
 export { fetchMenu, itemsByGroup, splitCategory, normOptions, EMPTY_MENU } from './menu';
 export { fetchSettings, fetchRestaurant, DEFAULT_SETTINGS, currentClosure, orderingState, deliveryFeeFor } from './settings';
 export { fetchContent, defaultsFromManifest, text, list, type ContentValues } from './content';
-export { subscribeNewsletter, sendContactMessage, fetchGallery } from './forms';
+export { subscribeNewsletter, sendContactMessage, fetchGallery, fetchNewsletterOffer, type NewsletterGift, type NewsletterOffer } from './forms';
 export { optionsTotal, missingRequired, selectionDetail, pick, unitPrice, type Selection } from './pricing';
 export { CartProvider, useCart } from './cart';
 export { startCheckout, validatePromo, readPaymentResult, toPayloadLines, type CheckoutPayload } from './checkout';
