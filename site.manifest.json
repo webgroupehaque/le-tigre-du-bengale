@@ -1,19 +1,21 @@
 [
-  { "key": "hero.line1", "label": "Titre, ligne 1 (blanc)", "type": "text", "group": "Accueil", "default": "Le Tigre" },
-  { "key": "hero.line2", "label": "Titre, ligne 2 (dorée)", "type": "text", "group": "Accueil", "default": "du Bengale" },
-  { "key": "hero.subtitle", "label": "Phrase d'accroche", "type": "textarea", "group": "Accueil", "default": "Laissez-vous transporter par les épices envoûtantes de l'Inde." },
-  { "key": "hero.tagline", "label": "Phrase en italique", "type": "text", "group": "Accueil", "default": "Une cuisine riche, chaleureuse et authentique." },
-  { "key": "hero.image", "label": "Photo d'accueil", "type": "image", "group": "Accueil", "default": "https://images.unsplash.com/photo-1585937421612-70a008356f36?q=80&w=2070&auto=format&fit=crop", "help": "Paysage, 1920 px de large idéalement." },
-  { "key": "info.hours_note", "label": "Mention sous « Horaires »", "type": "text", "group": "Accueil", "default": "Ouvert 7j/7" },
-  { "key": "info.order_note", "label": "Mention sous « Commander »", "type": "text", "group": "Accueil", "default": "Livraison & À emporter" },
-
-  { "key": "order.disclaimer", "label": "Mention en bas de la carte", "type": "text", "group": "Carte", "default": "Viandes Halal. Les chèques ne sont pas acceptés." },
-
-  { "key": "contact.address_note", "label": "Note sous l'adresse", "type": "text", "group": "Contact", "default": "Facile d'accès au centre de Nancy" },
-  { "key": "contact.phone_note", "label": "Note sous le téléphone", "type": "text", "group": "Contact", "default": "Réservations & Commandes" },
-
-  { "key": "footer.tagline", "label": "Ligne du pied de page", "type": "text", "group": "Pied de page", "default": "" },
-  { "key": "socials.facebook", "label": "Page Facebook", "type": "url", "group": "Réseaux" },
-  { "key": "socials.instagram", "label": "Instagram", "type": "url", "group": "Réseaux" },
-  { "key": "socials.google", "label": "Fiche Google (avis)", "type": "url", "group": "Réseaux" }
+  {"key":"hero.line1","label":"Titre, ligne 1 (blanc)","type":"text","group":"Accueil","default":"Le Tigre"},
+  {"key":"hero.line2","label":"Titre, ligne 2 (dorée)","type":"text","group":"Accueil","default":"du Bengale"},
+  {"key":"hero.subtitle","label":"Phrase d'accroche","type":"textarea","group":"Accueil","default":"Laissez-vous transporter par les épices envoûtantes de l'Inde."},
+  {"key":"hero.tagline","label":"Phrase en italique","type":"text","group":"Accueil","default":"Une cuisine riche, chaleureuse et authentique."},
+  {"key":"hero.image","label":"Photo d'accueil","type":"image","group":"Accueil","default":"https://images.unsplash.com/photo-1585937421612-70a008356f36?q=80&w=2070&auto=format&fit=crop","help":"Paysage, 1920 px de large idéalement."},
+  {"key":"info.hours_note","label":"Mention sous « Horaires »","type":"text","group":"Accueil","default":"Ouvert 7j/7"},
+  {"key":"info.order_note","label":"Mention sous « Commander »","type":"text","group":"Accueil","default":"Livraison & À emporter"},
+  {"key":"order.disclaimer","label":"Mention en bas de la carte","type":"text","group":"Carte","default":"Viandes Halal. Les chèques ne sont pas acceptés."},
+  {"key":"contact.address_note","label":"Note sous l'adresse","type":"text","group":"Contact","default":"Facile d'accès au centre de Nancy"},
+  {"key":"contact.phone_note","label":"Note sous le téléphone","type":"text","group":"Contact","default":"Réservations & Commandes"},
+  {"key":"footer.tagline","label":"Ligne du pied de page","type":"text","group":"Pied de page","default":""},
+  {"key":"socials.facebook","label":"Page Facebook","type":"url","group":"Réseaux"},
+  {"key":"socials.instagram","label":"Instagram","type":"url","group":"Réseaux"},
+  {"key":"socials.google","label":"Fiche Google (avis)","type":"url","group":"Réseaux"},
+  {"key":"legal.form","label":"Forme juridique","type":"text","group":"Mentions légales","help":"SARL, SAS, EI…"},
+  {"key":"legal.capital","label":"Capital social","type":"text","group":"Mentions légales","help":"Ex. 5 000 €"},
+  {"key":"legal.rcs","label":"RCS","type":"text","group":"Mentions légales","help":"Ex. RCS Nancy 123 456 789"},
+  {"key":"legal.address","label":"Adresse du siège","type":"text","group":"Mentions légales","help":"Si différente de l’adresse du restaurant."},
+  {"key":"legal.mediator","label":"Médiateur de la consommation","type":"text","group":"Mentions légales","help":"Nom et site du médiateur choisi (obligatoire pour la vente en ligne)."}
 ]

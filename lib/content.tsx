@@ -14,5 +14,5 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
 export function useSiteContent() {
   const v = useContext(Ctx);
-  return { c: (key: string) => text(v, key), cl: (key: string) => list(v, key) };
+  return { c: (key: string) => text(v, key), cl: (key: string) => list(v, key), values: v };
 }
