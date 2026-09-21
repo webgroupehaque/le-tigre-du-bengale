@@ -42,6 +42,8 @@ export async function loadRestaurant(db) {
       free_delivery_over: s?.free_delivery_over == null ? null : Number(s.free_delivery_over),
       min_order: Number(s?.min_order) || 0,
       delivery_zips: Array.isArray(s?.delivery_zips) ? s.delivery_zips : [],
+      prep_minutes: Number(s?.prep_minutes) || 20,
+      delivery_minutes: Number(s?.delivery_minutes) || 40,
       closures: Array.isArray(s?.closures) ? s.closures : [],
     },
   };

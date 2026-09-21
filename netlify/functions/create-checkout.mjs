@@ -30,7 +30,10 @@ export const handler = async (event) => {
     if (orderType === 'pickup' && !s.pickup_enabled) return resp(400, { error: 'Le retrait est indisponible.' });
     if (orderType === 'delivery') {
       if (!address?.line || !address?.zip || !address?.city) return resp(400, { error: 'Adresse de livraison incomplète.' });
-      if (s.delivery_zips.length > 0 && !s.delivery_zips.includes(String(address.zip).trim())) return resp(400, { error: `Nous ne livrons pas au ${address.zip}.` });
+      // Aucune zone renseignée = livraison ouverte à la France entière. Tant que les
+      // codes postaux ne sont pas réglés dans l'app, on refuse plutôt que d'accepter tout.
+      if (s.delivery_zips.length === 0) return resp(400, { error: 'La livraison n’est pas encore configurée.' });
+      if (!s.delivery_zips.includes(String(address.zip).trim())) return resp(400, { error: `Nous ne livrons pas au ${address.zip}.` });
     }
 
     // Recalcul des prix depuis la base (anti-fraude), options bornées.

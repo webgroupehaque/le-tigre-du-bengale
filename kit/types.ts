@@ -49,6 +49,9 @@ export type Settings = {
   freeDeliveryOver: number | null;
   minOrder: number;
   deliveryZips: string[];
+  /** Délais annoncés au client, en minutes (réglés dans l'app, Site → Réglages). */
+  prepMinutes: number;
+  deliveryMinutes: number;
   address: string;
   phone: string;
   email: string;

@@ -10,6 +10,8 @@ export const DEFAULT_SETTINGS: Settings = {
   freeDeliveryOver: null,
   minOrder: 0,
   deliveryZips: [],
+  prepMinutes: 20,
+  deliveryMinutes: 40,
   address: '',
   phone: '',
   email: '',
@@ -23,7 +25,7 @@ export const DEFAULT_SETTINGS: Settings = {
 };
 
 const COLS =
-  'ordering_enabled,delivery_enabled,pickup_enabled,delivery_fee,free_delivery_over,min_order,delivery_zips,address,phone,email,hours,closures,announcement,announcement_active,legal_company,legal_siret,legal_publisher';
+  'ordering_enabled,delivery_enabled,pickup_enabled,delivery_fee,free_delivery_over,min_order,delivery_zips,prep_minutes,delivery_minutes,address,phone,email,hours,closures,announcement,announcement_active,legal_company,legal_siret,legal_publisher';
 
 export async function fetchSettings(): Promise<Settings> {
   if (!hasSupabase) return DEFAULT_SETTINGS;
@@ -38,6 +40,8 @@ export async function fetchSettings(): Promise<Settings> {
     freeDeliveryOver: r.free_delivery_over == null ? null : Number(r.free_delivery_over),
     minOrder: Number(r.min_order) || 0,
     deliveryZips: Array.isArray(r.delivery_zips) ? (r.delivery_zips as string[]) : [],
+    prepMinutes: Number(r.prep_minutes) || 20,
+    deliveryMinutes: Number(r.delivery_minutes) || 40,
     address: String(r.address ?? ''),
     phone: String(r.phone ?? ''),
     email: String(r.email ?? ''),
@@ -73,7 +77,9 @@ export function orderingState(s: Settings): { enabled: boolean; modes: ('pickup'
   if (!s.orderingEnabled) return { enabled: false, modes: [], reason: 'La commande en ligne est désactivée.' };
   const modes: ('pickup' | 'delivery')[] = [];
   if (s.pickupEnabled) modes.push('pickup');
-  if (s.deliveryEnabled) modes.push('delivery');
+  // Livraison sans aucun code postal = livraison ouverte à la France entière : on la
+  // considère non configurée tant que les zones ne sont pas renseignées dans l'app.
+  if (s.deliveryEnabled && s.deliveryZips.length > 0) modes.push('delivery');
   if (modes.length === 0) return { enabled: false, modes, reason: 'Aucun mode de commande disponible.' };
   const closure = currentClosure(s.closures);
   if (closure) return { enabled: false, modes, reason: closure.label ? `Fermeture : ${closure.label}.` : 'Fermeture exceptionnelle.' };
@@ -85,4 +91,18 @@ export function deliveryFeeFor(s: Settings, subtotal: number, orderType: 'pickup
   if (orderType !== 'delivery' || subtotal <= 0) return 0;
   if (s.freeDeliveryOver != null && subtotal >= s.freeDeliveryOver) return 0;
   return s.deliveryFee;
+}
+
+/**
+ * Délai annoncé au client, en minutes, réglé dans l'app (Site → Réglages).
+ * Une seule source pour le site ET pour les e-mails : le client doit lire
+ * partout la même promesse.
+ */
+export function etaMinutes(s: Settings, orderType: 'pickup' | 'delivery'): number {
+  return orderType === 'delivery' ? s.deliveryMinutes : s.prepMinutes;
+}
+
+/** Le même délai, écrit pour être affiché : « ≈ 20 min ». */
+export function etaLabel(s: Settings, orderType: 'pickup' | 'delivery'): string {
+  return `≈ ${etaMinutes(s, orderType)} min`;
 }

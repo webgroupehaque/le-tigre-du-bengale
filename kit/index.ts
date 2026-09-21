@@ -9,7 +9,7 @@
 export * from './types';
 export { supabase, RESTAURANT_ID, hasSupabase, euro } from './supabase';
 export { fetchMenu, itemsByGroup, splitCategory, normOptions, EMPTY_MENU } from './menu';
-export { fetchSettings, fetchRestaurant, DEFAULT_SETTINGS, currentClosure, orderingState, deliveryFeeFor } from './settings';
+export { fetchSettings, fetchRestaurant, DEFAULT_SETTINGS, currentClosure, orderingState, deliveryFeeFor, etaMinutes, etaLabel } from './settings';
 export { fetchContent, defaultsFromManifest, text, list, type ContentValues } from './content';
 export { subscribeNewsletter, sendContactMessage, fetchGallery, fetchNewsletterOffer, type NewsletterGift, type NewsletterOffer } from './forms';
 export { optionsTotal, missingRequired, selectionDetail, pick, unitPrice, type Selection } from './pricing';
