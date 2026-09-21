@@ -41,3 +41,21 @@ export function readPaymentResult(): 'reussi' | 'annule' | null {
   window.history.replaceState({}, '', window.location.pathname + window.location.hash);
   return p;
 }
+
+/** Identifiant de la session de paiement, lu AVANT que l'URL soit nettoyée. */
+export function readPaymentSession(): string | null {
+  return new URLSearchParams(window.location.search).get('session');
+}
+
+/** Récapitulatif de la commande qui vient d'être payée (code, total, délai). */
+export type OrderReceipt = { code: string; orderType: 'pickup' | 'delivery'; total: number; paid: boolean; eta: number; email: string | null };
+
+export async function fetchReceipt(session: string): Promise<OrderReceipt | null> {
+  try {
+    const r = await fetch(`/.netlify/functions/order-receipt?session=${encodeURIComponent(session)}`);
+    if (!r.ok) return null;
+    return (await r.json()) as OrderReceipt;
+  } catch {
+    return null;
+  }
+}

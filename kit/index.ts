@@ -14,7 +14,7 @@ export { fetchContent, defaultsFromManifest, text, list, type ContentValues } fr
 export { subscribeNewsletter, sendContactMessage, fetchGallery, fetchNewsletterOffer, type NewsletterGift, type NewsletterOffer } from './forms';
 export { optionsTotal, missingRequired, selectionDetail, pick, unitPrice, type Selection } from './pricing';
 export { CartProvider, useCart } from './cart';
-export { startCheckout, validatePromo, readPaymentResult, toPayloadLines, type CheckoutPayload } from './checkout';
+export { startCheckout, validatePromo, readPaymentResult, readPaymentSession, fetchReceipt, toPayloadLines, type CheckoutPayload , type OrderReceipt } from './checkout';
 export { useMenu, useSettings, useRestaurant, useContent, useGallery, useBodyScrollLock, useEscape } from './hooks';
 export { legalPages, type LegalPage } from './legal';
 export { useVisitTracking, VisitTracker, trackPageView, visitSource } from './analytics';

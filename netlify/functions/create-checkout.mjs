@@ -115,7 +115,7 @@ export const handler = async (event) => {
       line_items: stripeItems,
       ...(discounts.length ? { discounts } : {}),
       customer_email: customer.email,
-      success_url: `${origin}/?paiement=reussi`,
+      success_url: `${origin}/?paiement=reussi&session={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/?paiement=annule`,
       metadata: { order_id: order.id, promo_code: appliedCode, restaurant_id: RESTAURANT_ID },
     });
